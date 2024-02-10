@@ -1,8 +1,15 @@
-// ColorPalleter.tsx
 import React from 'react'
 import { Box, Grid } from '@mui/material'
 import { Check } from '@mui/icons-material'
 import ColorUtils from '@app/helpers/ColorUtils'
+import styled from 'styled-components'
+
+const StyledBox = styled(Box)`
+  width: 20px;
+  height: 20px;
+  padding: 0px;
+  border-radius: 50%;
+`
 
 interface ColorPalleterProps {
   colors?: string[]
@@ -42,21 +49,17 @@ const ColorButton: React.FC<ColorButtonProps> = ({ color, selected, onChange }) 
   }
 
   return (
-    <Box
+    <StyledBox
       onClick={handleClick}
       style={{
-        borderRadius: '50%',
         backgroundColor: color,
-        width: 20,
-        height: 20,
-        padding: 0,
         border: `1px solid ${ColorUtils.getContrastingColor(color)}`,
       }}
     >
       {selected && (
         <Check style={{ color: ColorUtils.getContrastingColor(color), fontSize: '18px' }} />
       )}
-    </Box>
+    </StyledBox>
   )
 }
 

@@ -1,7 +1,7 @@
 import { Button, Grid } from '@mui/material'
 import { useEffect, useState } from 'react'
 import Memo from '../memo/Components/Memo'
-import { fetchMemoList, insertMemo } from '@app/api/memo/memo-api'
+import { Specfication, fetchMemoList, insertMemo } from '@app/api/memo/memo-api'
 import AddEditDialog from '../memo/Dialog/AddEditDialog'
 import { MemoInput, TabDataInput } from '@app/api/memo/memo-type'
 import { RootState } from '@app/store/store'
@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux'
 import { useUnmount } from 'react-use'
 import memoStore from '@app/store/memoStore/MemoStore'
 import React from 'react'
+import SearchButton from '../memo/Components/SearchButton'
 
 type Props = {
   screenId?: string
@@ -19,6 +20,7 @@ const StudyList: React.FC<Props> = () => {
   const { loadingStatus, dataList } = useSelector((state: RootState) => state.memoStore)
 
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [specification, setSpecification] = useState<Specfication>({ type: 'study' })
 
   const dispatch = useDispatch()
 
@@ -26,7 +28,7 @@ const StudyList: React.FC<Props> = () => {
     const handleFetchData = async () => {
       try {
         dispatch(memoStore.actions.setLoadingStatus('Loading'))
-        const fetchedData = await fetchMemoList()
+        const fetchedData = await fetchMemoList(specification)
         dispatch(memoStore.actions.setMemoList(fetchedData))
       } catch (error) {
         console.log(error)
@@ -70,6 +72,11 @@ const StudyList: React.FC<Props> = () => {
     handleDialogClose()
   }
 
+  const handleSetSpecification = (item: Specfication) => {
+    setSpecification(item)
+    dispatch(memoStore.actions.setLoadingStatus('NotLoad'))
+  }
+
   if (loadingStatus === 'Loading' || loadingStatus === 'NotLoad') {
     return <>...Loading</>
   }
@@ -83,7 +90,7 @@ const StudyList: React.FC<Props> = () => {
           mode='study'
         />
       )}
-
+      <SearchButton setSpecification={handleSetSpecification} specification={specification} />
       <Grid item xs={12}>
         <Button variant='contained' onClick={handleAddButtonClick}>
           Add New

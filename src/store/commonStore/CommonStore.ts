@@ -19,6 +19,8 @@ export type CommonState = {
   darkMode: boolean
 }
 
+export type DialogState = 'add' | 'edit' | 'none'
+
 export type MessageAlertProp = {
   info?: string
   isShowAlert?: boolean

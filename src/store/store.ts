@@ -12,6 +12,7 @@ import {
 } from 'redux-persist'
 import commonStore from './commonStore/CommonStore'
 import memoStore from './memoStore/MemoStore'
+import tagStore from './tagStore/TagStore'
 
 const rootPersistConfig = {
   key: 'root',
@@ -22,6 +23,7 @@ const rootPersistConfig = {
 const rootReducer = combineReducers({
   commonStore: commonStore.reducer,
   memoStore: memoStore.reducer,
+  tagStore: tagStore.reducer,
 })
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer)

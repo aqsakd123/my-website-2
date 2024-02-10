@@ -5,11 +5,14 @@ import { drawerWidth } from './components/Sidebar'
 import commonStore from '@app/store/commonStore/CommonStore'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@app/store/store'
-import { baseFontColors } from '@app/config/ThemeProvider'
+import { baseGroundColor } from '@app/config/ThemeProvider'
 import BackgroundIMG from '@app/assets/img/abstract.jpg'
 import styled from 'styled-components'
 
 const StyledDefault = styled.div`
+  width: 100%;
+  height: calc(100% - 64px);
+
   .cover-img {
     width: 100%;
     height: 100%;
@@ -26,6 +29,12 @@ const StyledDefault = styled.div`
     padding-right: 20px;
     width: 100%;
     min-height: 100%;
+    transition: all 0.4s ease;
+    padding-bottom: 20px;
+  }
+
+  .cover-img {
+    background-image: url(${BackgroundIMG});
   }
 `
 
@@ -39,12 +48,11 @@ const Default = () => {
   }
 
   return (
-    <StyledDefault style={{ width: '100%', height: 'calc(100% - 64px)' }}>
+    <StyledDefault>
       <Header displaySidebar={isSidebar} handleChangeSideStatus={handleChangeSideStatus} />
       <div
         className='cover-img'
         style={{
-          backgroundImage: `url(${BackgroundIMG})`,
           color: darkMode ? 'white' : 'black',
         }}
       >
@@ -52,9 +60,7 @@ const Default = () => {
           className='container-content'
           style={{
             paddingLeft: isSidebar ? `${drawerWidth + 35}px` : '75px',
-            transition: 'all 0.4s ease',
-            paddingBottom: '20px',
-            backgroundColor: darkMode ? `${baseFontColors(darkMode).primary}c7` : '#ffffff7a',
+            backgroundColor: darkMode ? `${baseGroundColor(darkMode).primary}c7` : '#ffffff7a',
           }}
         >
           <Outlet />

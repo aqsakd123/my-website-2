@@ -30,6 +30,7 @@ const QuillEditor: React.FC<MyEditorProps> = (props: MyEditorProps) => {
   const { value, handleChange, readOnly, modules = defaultModules } = props
 
   const [content, setContent] = useState<string>(value || '')
+  const quillRef = React.useRef()
 
   const handleEditorChange = (value: string) => {
     setContent(value)
@@ -40,7 +41,6 @@ const QuillEditor: React.FC<MyEditorProps> = (props: MyEditorProps) => {
       handleChange(content)
     }
   }, [content])
-  //   const toolbarElement = document.querySelector('.ql-toolbar')
 
   return (
     <Box
@@ -67,13 +67,27 @@ const QuillEditor: React.FC<MyEditorProps> = (props: MyEditorProps) => {
         },
       }}
     >
-      <ReactQuill
-        theme='snow'
-        value={content}
-        onChange={handleEditorChange}
-        readOnly={readOnly}
-        modules={modules}
-      />
+      {!readOnly ? (
+        <ReactQuill
+          theme='snow'
+          value={content}
+          onChange={handleEditorChange}
+          readOnly={readOnly}
+          modules={modules}
+          // @ts-ignore
+          ref={quillRef}
+        />
+      ) : (
+        <Box
+          sx={{
+            padding: '8px',
+            '& p': {
+              margin: '5px 0px',
+            },
+          }}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      )}
     </Box>
   )
 }

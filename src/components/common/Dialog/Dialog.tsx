@@ -12,6 +12,8 @@ import MuiDialogContent, {
 import MuiDialogActions, {
   DialogActionsProps as MuiDialogActionsProps,
 } from '@mui/material/DialogActions'
+import { useSelector } from 'react-redux'
+import { RootState } from '@app/store/store'
 
 const EditTypeDialogTitleContainer = styled.div`
   margin: 14px 14px 0 14px;
@@ -69,10 +71,17 @@ export const DialogActions: React.FC<DialogActionsProps> = ({
   children,
   ...others
 }: DialogActionsProps) => {
+  const darkMode = useSelector((state: RootState) => state.commonStore.darkMode)
+
   return (
     <MuiDialogActions
       {...others}
-      style={{ borderTop: '1px solid rgba(0, 0, 0, 0.12)', padding: '12px 21px' }}
+      style={{
+        borderTop: darkMode
+          ? '1px solid rgba(255, 255, 255, 0.12)'
+          : '1px solid rgba(0, 0, 0, 0.12)',
+        padding: '12px 21px',
+      }}
     >
       {children}
     </MuiDialogActions>
@@ -113,12 +122,20 @@ const SimpleDialogTitle: React.FC<SimpleDialogTitleProps> = ({
   title,
   onClickReturn,
 }: SimpleDialogTitleProps) => {
+  const darkMode = useSelector((state: RootState) => state.commonStore.darkMode)
+
   const handleClickReturn = () => {
     onClickReturn()
   }
 
   return (
-    <SimpleTypeDialogTitle style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>
+    <SimpleTypeDialogTitle
+      style={{
+        borderBottom: darkMode
+          ? '1px solid rgba(255, 255, 255, 0.12)'
+          : '1px solid rgba(0, 0, 0, 0.12)',
+      }}
+    >
       <SimpleTypeDialogTitleText data-testid='dialog-title'>{title}</SimpleTypeDialogTitleText>
       <IconButton onClick={handleClickReturn} data-testid='CloseButton'>
         <Close />

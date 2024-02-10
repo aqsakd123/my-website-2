@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import styled from '@emotion/styled'
-import { Box, ListItem, ListItemButton, ListItemText, Tooltip } from '@mui/material'
+import { Box, ListItem, ListItemButton, Tooltip } from '@mui/material'
 import { LinkItemsType } from '../components/Sidebar'
 import { ReactFragment, ReactNode, useState } from 'react'
 import { keyframes, styled as cStyled } from 'styled-components'
@@ -11,23 +11,28 @@ import ColorUtils from '@app/helpers/ColorUtils'
 import { ArrowDropDownSharp } from '@mui/icons-material'
 import AnimatedIcon from './AnimatedIcon'
 
-const StyledLink = styled(Link)`
+const StyledLink = styled(Box)<{ $hideMode: boolean; $isSelected: boolean; $sidebarColor: string }>`
   width: 100%;
   padding: 0px;
 
-  .css-180cu36 {
+  .list-item {
     padding: 0px;
-  }
+    display: flex;
+    ${({ $isSelected }) => ($isSelected ? `background-color: rgb(0,0,0,0.25);` : '')}
+    color: ${({ $sidebarColor }) => ColorUtils.getContrastingColor($sidebarColor)};
 
-  .styled-link {
-    padding: 0px;
-    margin-right: 0px;
+    .styled-link {
+      padding: 0px;
+      margin-right: 0px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      color: ${({ $sidebarColor }) => ColorUtils.getContrastingColor($sidebarColor)};
+    }
   }
 
   .list-text {
-    span {
-      font-weight: 600;
-    }
+    font-weight: 600;
   }
 
   .styled-linked-item {
@@ -35,8 +40,14 @@ const StyledLink = styled(Link)`
     overflow: hidden;
     text-overflow: ellipsis;
     display: flex;
-    justify-content: center;
+    ${({ $hideMode }) => ($hideMode ? `justify-content: center;` : 'justify-content: flex-start;')}
     align-items: center;
+  }
+
+  .arrow-icon {
+    ${({ $hideMode }) => ($hideMode ? `transform: rotate(180deg);` : '')}
+    transition: transform 0.3s ease-in-out;
+    height: 100%;
   }
 `
 
@@ -66,7 +77,8 @@ const shakeAnimation = keyframes`
 const ShakingTextWrapper = cStyled.span`  
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
   color: coral;
-  
+  font-size: 14px;
+
   &:hover {
     animation: ${shakeAnimation} 0.5s ease-in-out infinite;
   }
@@ -84,7 +96,6 @@ const IconLinkList = (props: Props) => {
   const { handleClick, item, isOpen } = props
 
   const { icon, children } = item
-
   const [openHide, setOpenHide] = useState(false)
 
   const selectedColor = useSelector((state: RootState) => state.commonStore.sidebarColor)
@@ -103,27 +114,9 @@ const IconLinkList = (props: Props) => {
   const selected = location.pathname.split('/')[1] === item?.link.replace('/', '')
 
   return (
-    <>
-      <ListItem
-        onClick={handleClickItem}
-        style={{
-          padding: '0px',
-          display: 'flex',
-          backgroundColor: selected ? `rgb(0,0,0,0.25)` : undefined,
-          color: ColorUtils.getContrastingColor(selectedColor),
-        }}
-      >
-        <StyledLink
-          className='styled-link'
-          to={item.link}
-          style={{
-            padding: '0px',
-            marginRight: '0px',
-            display: 'flex',
-            alignItems: 'center',
-            color: ColorUtils.getContrastingColor(selectedColor),
-          }}
-        >
+    <StyledLink $hideMode={!isOpen} $isSelected={selected} $sidebarColor={selectedColor}>
+      <ListItem className='list-item' onClick={handleClickItem}>
+        <Link className='styled-link' to={item.link}>
           <Tooltip title={!isOpen ? item.text : undefined} placement='right'>
             <ListItemButton className='styled-linked-item'>
               {icon && (
@@ -134,19 +127,12 @@ const IconLinkList = (props: Props) => {
               {isDisplayFirstChar && (
                 <ShakingTextWrapper>{item.text[0]?.toUpperCase()}</ShakingTextWrapper>
               )}
-              {isOpen && <ListItemText className='list-text' primary={item.text} />}
+              {isOpen && <span className='list-text'>{item.text}</span>}
             </ListItemButton>
           </Tooltip>
-        </StyledLink>
-        {children?.length && openHide && children?.length > 0 && (
-          <ArrowDropDownSharp
-            sx={{
-              transform: `rotate(${openHide ? 180 : 0}deg)`,
-              transition: 'transform 0.3s ease-in-out',
-              height: '100%',
-            }}
-            onClick={handleHide}
-          />
+        </Link>
+        {children && isOpen && children?.length > 0 && (
+          <ArrowDropDownSharp className='arrow-icon' onClick={handleHide} />
         )}
       </ListItem>
 
@@ -155,13 +141,13 @@ const IconLinkList = (props: Props) => {
           {children?.map((child) => (
             <ListItem key={child.id} disablePadding>
               <ListItemButton style={{ paddingLeft: '50px' }}>
-                <ListItemText primary={child.text} />
+                <span className='list-text'>{item.text}</span>
               </ListItemButton>
             </ListItem>
           ))}
         </Box>
       )}
-    </>
+    </StyledLink>
   )
 }
 

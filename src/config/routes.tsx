@@ -8,7 +8,7 @@ import Next7Days from '@app/pages/home/Next7Days'
 import Workspaces from '@app/pages/to-do-list/workspaces/Workspaces'
 import Award from '@app/pages/award/Award'
 import MemoList from '@app/pages/cards/memo/MemoList'
-import StudyList from '@app/pages/cards/study-cards/StudyList'
+import StudyList from '@app/pages/cards/StudyCard/StudyList'
 
 export type RouteInfo = {
   path: string

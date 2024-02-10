@@ -18,6 +18,35 @@ type HeaderProps = {
 const StyledMenu = styled(MenuItem)`
   width: 220px;
 `
+const StyledHeader = styled.div`
+  transition: all 0.4s ease;
+  height: 64px;
+  background-color: #111827;
+  border-bottom: 1px solid white;
+
+  .header-icon {
+    color: #94a3b8;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    margin-left: 10px;
+
+    .title {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .divider {
+      margin-left: 5px;
+      height: 25px;
+      margin-right: 15px;
+    }
+  }
+`
 
 const Header = (props: HeaderProps) => {
   const { displaySidebar, handleChangeSideStatus } = props
@@ -49,38 +78,19 @@ const Header = (props: HeaderProps) => {
   }
 
   return (
-    <div
-      className='header'
-      style={{
-        transition: 'all 0.4s ease',
-        height: '64px',
-        backgroundColor: '#111827',
-        borderBottom: '1px solid white',
-      }}
-    >
-      <Box
-        style={{
-          display: 'flex',
-          flexDirection: 'row-reverse',
-          alignItems: 'center',
-          marginLeft: '10px',
-        }}
-      >
+    <StyledHeader className='header'>
+      <Box className='header-left'>
         <Sidebar open={displaySidebar} setTitle={setTitle} />
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <IconButton onClick={handleChangeSideStatus} style={{ color: '#94a3b8' }}>
+        <div className='title'>
+          <IconButton className='header-icon' onClick={handleChangeSideStatus}>
             <ViewHeadlineIcon />
           </IconButton>
-          <Divider
-            orientation='vertical'
-            color='#94a3b8'
-            style={{ marginLeft: '5px', height: '25px', marginRight: '15px' }}
-          />
-          <span className='header-title'>{title || 'Demo-FE'}</span>
+          <Divider className='divider' orientation='vertical' color='#94a3b8' />
+          <span className='header-title'>{title}</span>
         </div>
       </Box>
       <div className='header-right'>
-        <IconButton onClick={handleClick} style={{ color: '#94a3b8' }}>
+        <IconButton className='header-icon' onClick={handleClick}>
           <Person />
         </IconButton>
         <Menu
@@ -103,7 +113,7 @@ const Header = (props: HeaderProps) => {
           <StyledMenu onClick={handleLogout}>Logout</StyledMenu>
         </Menu>
       </div>
-    </div>
+    </StyledHeader>
   )
 }
 

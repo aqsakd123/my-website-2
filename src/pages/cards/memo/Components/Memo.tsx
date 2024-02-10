@@ -1,5 +1,16 @@
 import React, { useState } from 'react'
-import { Box, Tab, Tabs, IconButton, Menu, MenuItem, Grid, TextField, Tooltip } from '@mui/material'
+import {
+  Box,
+  Tab,
+  Tabs,
+  IconButton,
+  Menu,
+  MenuItem,
+  Grid,
+  TextField,
+  Tooltip,
+  Button,
+} from '@mui/material'
 import { Add, CloseSharp, DragIndicator, MoreHorizOutlined } from '@mui/icons-material'
 import AddEditDialog from '../Dialog/AddEditDialog'
 import TextInput from '@app/components/common/TextInputField/TextInput'
@@ -7,13 +18,14 @@ import useConfirm from '@app/components/common/ConfirmDialog/useConfirm'
 import ColorPalleter from './ColorPallete'
 import ColorUtils from '@app/helpers/ColorUtils'
 import { BsPinAngleFill } from 'react-icons/bs'
-import QuillEditor from '@app/components/common/QuillEditor/QuillEditor'
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd'
 import { StrictModeDroppable } from '@app/components/common/StrictModeDroppable/StrictModeDroppable'
 import { MemoInput, TabDataInput } from '@app/api/memo/memo-type'
 import { changeStatus, deleteMemo, updateMemo } from '@app/api/memo/memo-api'
 import { useDispatch } from 'react-redux'
 import memoStore from '@app/store/memoStore/MemoStore'
+import styled from 'styled-components'
+import SunEditor from '@app/components/common/SunEditor/SunEditor'
 
 type Props = {
   listData: MemoInput
@@ -24,7 +36,133 @@ type TabType = TabDataInput & {
   prefixId: string
 }
 
-const TAB_BACKGROUND_COLOR = '#8680dc'
+const StyledDraggable = styled(Box)`
+  height: 100%;
+
+  & .MuiTabs-indicator {
+    background-color: #000eff;
+  }
+`
+
+const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type: string }>`
+  .containe-box {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    padding: 0px 8px;
+    align-items: center;
+
+    & .MuiInputBase-input {
+      color: ${({ $colorData }) => ColorUtils.getContrastingColor($colorData)};
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 5px;
+
+      .name-memo {
+        white-space: pre-line;
+        word-break: break-word;
+      }
+    }
+  }
+
+  .tab-container {
+    border-radius: 8px;
+    display: flex;
+
+    .tab-item {
+      border-radius: 8px 0px 0px 8px;
+      height: 100%;
+    }
+
+    .drag-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .tab-tabname {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+
+    .tab-component {
+      min-width: 50px;
+      max-width: 150px;
+      width: 100%;
+      padding-left: 3px;
+      padding-right: 3px;
+      min-height: 30px;
+    }
+
+    .tab-idx {
+      display: flex;
+      alignitems: center;
+      color: ${({ $colorData }) => ColorUtils.getContrastingColor($colorData)};
+      & .MuiInputBase-input {
+        color: ${({ $colorData }) => ColorUtils.getContrastingColor($colorData)};
+      }
+    }
+  }
+
+  .sun-editor-container {
+    border-radius: ${({ $type }) => ($type === 'memo' ? '8px' : '0px 8px 8px 0px')};
+    height: ${({ $type }) => ($type === 'memo' ? '300px' : '500px')};
+    overflow: auto;
+    width: 100%;
+
+    .sun-editor-editable,
+    .se-container,
+    .se-wrapper,
+    .sun-editor {
+      background-color: #fff0;
+    }
+
+    .se-resizing-bar {
+      display: none;
+    }
+  }
+
+  .sun-editor-item {
+    .MuiInputBase-input {
+      color: ${({ $colorData }) => ColorUtils.getContrastingColor($colorData)};
+      font-weight: 100;
+    }
+
+    .MuiInputBase-root {
+      border-radius: ${({ $type }) => ($type === 'memo' ? '8px 8px 0px 0px' : '0px 8px 0px 0px')};
+    }
+
+    .sun-editor-editable table td,
+    .sun-editor-editable table th {
+      border: 1px solid #6d6d6d;
+    }
+
+    .sun-editor-editable blockquote {
+      border: solid #1100ff;
+      color: wheat;
+      background-color: #3b3737;
+      border-width: 0 0 0 5px;
+    }
+  }
+
+  .color-palette {
+    margin-left: 15px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
+`
 
 const Memo: React.FC<Props> = (props: Props) => {
   const { listData, type = 'memo' } = props
@@ -199,24 +337,20 @@ const Memo: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <Grid item xs={type === 'memo' ? 6 : 12}>
+    <StyledGrid
+      item
+      xs={type === 'memo' ? 6 : 12}
+      $colorData={colorData}
+      $editMode={editMode}
+      $type={type}
+    >
       <Box
+        className='containe-box'
         sx={{
           ...colorStyle,
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontWeight: 600,
-          borderRadius: '10px',
-          fontSize: '16px',
-          marginBottom: '20px',
-          padding: '0px 8px',
-          alignItems: 'center',
-          '& .MuiInputBase-input': {
-            color: ColorUtils.getContrastingColor(colorData),
-          },
         }}
       >
-        <Box display='flex' alignItems='center' gap='10px' sx={{ width: '100%', padding: '5px' }}>
+        <Box className='header-bar'>
           {pinnedData && <BsPinAngleFill />}
           {editMode ? (
             <TextInput
@@ -233,7 +367,7 @@ const Memo: React.FC<Props> = (props: Props) => {
               required
             />
           ) : (
-            <span style={{ whiteSpace: 'pre-line', wordBreak: 'break-word' }}>{name}</span>
+            <span className='name-memo'>{name}</span>
           )}
         </Box>
         <IconButton size='small' onClick={handleMoreOptionsClick}>
@@ -249,21 +383,22 @@ const Memo: React.FC<Props> = (props: Props) => {
           <MenuItem onClick={handleClickDelete}>Delete</MenuItem>
         </Menu>
       </Box>
-      <Box style={{ borderRadius: '20px' }}>
+      <Box className='tab-container'>
         {type === 'study' && (
-          <Box display='flex' alignItems='center'>
+          <Box alignItems='center'>
             <DragDropContext onDragEnd={onDragEnd}>
               <StrictModeDroppable droppableId='tabs' direction='horizontal'>
                 {(provided) => (
-                  <Box ref={provided.innerRef} {...provided.droppableProps}>
+                  <StyledDraggable ref={provided.innerRef} {...provided.droppableProps}>
                     <Tabs
+                      className='tab-item'
                       value={tabIdx}
+                      orientation='vertical'
                       indicatorColor='primary'
                       textColor='primary'
                       // onChange={handleTabChange}
                       style={{
-                        borderRadius: '20px 20px 0px 0px',
-                        backgroundColor: TAB_BACKGROUND_COLOR,
+                        ...colorStyle,
                       }}
                     >
                       {tabs.map((tab, index) => {
@@ -277,39 +412,21 @@ const Memo: React.FC<Props> = (props: Props) => {
                                 ref={innerProvided.innerRef}
                                 {...innerProvided.draggableProps}
                                 {...innerProvided.dragHandleProps}
+                                className='drag-item'
                                 sx={{
                                   backgroundColor: isSelected ? colorData : undefined,
-                                  display: 'flex',
-                                  alignItems: 'center',
                                   '& .MuiTab-root': {
                                     paddingRight: editMode ? '0px' : undefined,
                                     paddingLeft: editMode ? '5px' : undefined,
                                   },
                                 }}
+                                onClick={() => handleTabChange(tab.prefixId)}
                               >
-                                {editMode && (
-                                  <DragIndicator
-                                    style={{
-                                      color: ColorUtils.getContrastingColor(
-                                        isSelected ? colorData : TAB_BACKGROUND_COLOR,
-                                      ),
-                                    }}
-                                  />
-                                )}
+                                {editMode && <DragIndicator className='indicator' />}
                                 <Tab
                                   id={`${index}-tab`}
-                                  onClick={() => handleTabChange(tab.prefixId)}
                                   label={
-                                    <Box
-                                      sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        color: ColorUtils.getContrastingColor(colorData),
-                                        '& .MuiInputBase-input': {
-                                          color: ColorUtils.getContrastingColor(colorData),
-                                        },
-                                      }}
-                                    >
+                                    <Box className='tab-idx'>
                                       {editMode ? (
                                         <TextField
                                           variant='standard'
@@ -323,17 +440,11 @@ const Memo: React.FC<Props> = (props: Props) => {
                                           required
                                         />
                                       ) : (
-                                        <Tooltip title={isTooltip ? tab.tabName : ''}>
-                                          <span
-                                            style={{
-                                              whiteSpace: 'nowrap',
-                                              overflow: 'hidden',
-                                              textOverflow: 'ellipsis',
-                                              maxWidth: '80px',
-                                            }}
-                                          >
-                                            {tab.tabName}
-                                          </span>
+                                        <Tooltip
+                                          title={isTooltip ? tab.tabName : ''}
+                                          placement='right'
+                                        >
+                                          <span className='tab-tabname'>{tab.tabName}</span>
                                         </Tooltip>
                                       )}
                                       &nbsp;
@@ -346,94 +457,57 @@ const Memo: React.FC<Props> = (props: Props) => {
                                     </Box>
                                   }
                                   style={{
-                                    minWidth: '50px',
-                                    maxWidth: '150px',
-                                    borderRadius: isSelected ? '20px 20px 0px 0px' : undefined,
                                     color: isSelected ? 'white' : 'black',
                                     fontWeight: isSelected ? 'bold' : 'normal',
                                   }}
+                                  className='tab-component'
                                 />
                               </Box>
                             )}
                           </Draggable>
                         )
                       })}
+                      {tabs?.length <= 10 && editMode && (
+                        <Button
+                          onClick={handleAddButtonClick}
+                          sx={{ ...colorStyle, marginTop: '5px' }}
+                        >
+                          <Add />
+                        </Button>
+                      )}
+
                       {provided.placeholder}
                     </Tabs>
-                  </Box>
+                  </StyledDraggable>
                 )}
               </StrictModeDroppable>
             </DragDropContext>
-
-            {tabs?.length <= 5 && editMode && (
-              <IconButton onClick={handleAddButtonClick} sx={{ ...colorStyle, marginLeft: '10px' }}>
-                <Add />
-              </IconButton>
-            )}
           </Box>
         )}
         {tabs.map((tab, index) => {
-          const txtColor = ColorUtils.getContrastingColor(colorData)
           return (
             <Box
+              className='sun-editor-container'
               key={tab.prefixId}
               display={index === tabIdx ? undefined : 'none'}
               sx={{
                 ...colorStyle,
-                borderRadius: type === 'memo' ? '20px' : '0px 20px 20px 20px',
-                height: type === 'memo' ? '300px' : '500px',
-                overflow: 'auto',
-                '.ql-formats': {
-                  'button, span': {
-                    color: txtColor,
-                    svg: {
-                      '.ql-fill': {
-                        fill: txtColor,
-                      },
-                      '.ql-stroke': {
-                        stroke: txtColor,
-                        color: txtColor,
-                      },
-                    },
-                  },
-                },
               }}
             >
-              <Box
-                sx={{
-                  height: 'calc(100% - 30px)',
-                  '& .MuiInputBase-input': {
-                    color: ColorUtils.getContrastingColor(colorData),
-                    fontWeight: 100,
-                  },
-                  '& .MuiInputBase-root': {
-                    borderRadius: type === 'memo' ? '20px 20px 0px 0px' : '0px 20px 0px 0px',
-                  },
-                }}
-              >
-                <QuillEditor
-                  handleChange={updateTabsContent}
-                  value={tab.tabContent}
-                  readOnly={!editMode}
-                  modules={
-                    type === 'memo'
-                      ? {
-                          toolbar: [
-                            ['bold', 'italic', 'underline', 'strike'],
-                            [{ color: [] }, { background: [] }],
-                            [{ font: [] }],
-                            [{ align: [] }],
-                          ],
-                        }
-                      : undefined
-                  }
+              <Box className='sun-editor-item'>
+                <SunEditor
+                  name='tab-content'
+                  onChange={updateTabsContent}
+                  setContents={tab.tabContent}
+                  // readOnly={!editMode}
+                  height='410px'
                 />
               </Box>
-              <Box
-                sx={{ marginLeft: '15px', height: '30px', display: 'flex', alignItems: 'center' }}
-              >
-                <ColorPalleter onChange={updateTabsColors} value={colorData} />
-              </Box>
+              {editMode && (
+                <Box className='color-palette'>
+                  <ColorPalleter onChange={updateTabsColors} value={colorData} />
+                </Box>
+              )}
             </Box>
           )
         })}
@@ -446,7 +520,7 @@ const Memo: React.FC<Props> = (props: Props) => {
           />
         )}
       </Box>
-    </Grid>
+    </StyledGrid>
   )
 }
 

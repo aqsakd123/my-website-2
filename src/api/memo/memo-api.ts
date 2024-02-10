@@ -10,7 +10,13 @@ import {
 
 const BASE_URL = '/graphql'
 
-export const fetchMemoList = async (specification?: any) => {
+export type Specfication = {
+  name?: string
+  tags?: [string]
+  type: string
+}
+
+export const fetchMemoList = async (specification?: Specfication) => {
   const response = await axiosInstance.post(BASE_URL, {
     query: GET_LIST_MEMOS,
     variables: {

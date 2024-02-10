@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { Control, Controller } from 'react-hook-form'
 import { BlockPicker, Color, ColorResult } from 'react-color'
 import Button from '@mui/material/Button/Button'
-import { Popover, useControlled } from '@mui/material'
+import { Popover } from '@mui/material'
+import ColorUtils from '@app/helpers/ColorUtils'
 
 // color: ${({ $bgColor }) => Colors.getContrastingColor($bgColor || '')};
 
@@ -12,15 +13,14 @@ const ColorInputButton = styled(Button)<{ $bgColor?: string }>`
 
   &.MuiButton-outlined {
     padding: 5px;
-    background-color: #ffffff;
+    background-color: ${({ $bgColor }) => $bgColor || ''};
+    color: ${({ $bgColor }) => ($bgColor ? ColorUtils.getContrastingColor($bgColor) : '')};
     border: 1px solid #b2b0ad;
     &:hover {
       border: 1px solid #ffd5ba;
       background-color: #ffd5ba;
+      color: ${({ $bgColor }) => ColorUtils.getContrastingColor($bgColor)};
     }
-  }
-  & .MuiButton-label {
-    background-color: ${({ $bgColor }) => $bgColor || ''};
   }
   &.Mui-disabled {
     background-color: #eeeeee;
@@ -128,17 +128,12 @@ const ColorInputInternal: React.FC<InternalProps> = ({
   id,
   name,
   value: valueProp,
-  defaultValue,
   onChange,
   disabled,
-  clearable,
+  clearable = true,
   colors,
 }: InternalProps) => {
-  const [value, setValue] = useControlled<string | undefined>({
-    controlled: valueProp,
-    default: defaultValue,
-    name: 'ColorInput',
-  })
+  const [value, setValue] = useState<string | undefined>(valueProp)
 
   const buttonElemRef = React.useRef()
   const [showPicker, setShowPicker] = React.useState<boolean>(false)

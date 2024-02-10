@@ -19,7 +19,7 @@ const TextInputField: React.FC<Props> = (props: Props) => {
     name,
     required,
     suffix,
-    label,
+    label = '',
     labelWidth,
     error,
     disabled,

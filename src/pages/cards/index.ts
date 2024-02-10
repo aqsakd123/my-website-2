@@ -1,4 +1,4 @@
 import Memo from './memo/Components/Memo'
-import StudyList from './study-cards/StudyList'
+import StudyList from './StudyCard/StudyList'
 
 export { Memo, StudyList }

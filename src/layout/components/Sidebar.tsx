@@ -17,6 +17,7 @@ import { GrTrophy } from 'react-icons/gr'
 import { GiTargeting } from 'react-icons/gi'
 import { LuBookMarked } from 'react-icons/lu'
 import { AnimationType } from '../common/AnimatedIcon'
+import { tokens } from '@app/config/ThemeProvider'
 
 export const drawerWidth = 240
 type SidebarProps = {
@@ -50,7 +51,7 @@ const StyledDrawer = styled(Drawer)<{ $isOpen: boolean }>`
     left: 20px;
     flex-shrink: 0;
     border: none;
-    border-radius: 10px;
+    border-radius: 4px;
     box-shadow: 4px;
   }
 
@@ -152,7 +153,9 @@ const Sidebar = (props: SidebarProps) => {
   const { open, setTitle } = props
 
   const selectedColor = useSelector((state: RootState) => state.commonStore.sidebarColor)
+  const darkMode = useSelector((state: RootState) => state.commonStore.darkMode)
 
+  const borderColor = tokens(darkMode).blueAccent[300]
   function handleChooseLink(item: LinkItemsType): void {
     setTitle(item.text)
   }
@@ -160,7 +163,13 @@ const Sidebar = (props: SidebarProps) => {
   return (
     <>
       <StyledDrawer variant='persistent' anchor='left' $isOpen={open} open>
-        <List className='list' style={{ backgroundColor: selectedColor }}>
+        <List
+          className='list'
+          style={{
+            backgroundColor: selectedColor,
+            border: open ? `4px solid ${borderColor}` : 'none',
+          }}
+        >
           {linkItems.map((item) => (
             <IconLinkList key={item.id} handleClick={handleChooseLink} item={item} isOpen={open} />
           ))}

@@ -15,6 +15,7 @@ type Props = {
   tabs?: TabDataInput[]
   mode?: 'tab' | 'memo' | 'study'
 }
+
 const AddEditDialog: React.FC<Props> = (props: Props) => {
   const { handleDialogClose, handleSubmit, tabs, mode } = props
 

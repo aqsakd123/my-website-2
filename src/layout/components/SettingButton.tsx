@@ -10,7 +10,23 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@app/store/store'
 import commonStore, { colorOptions } from '@app/store/commonStore/CommonStore'
 
+const StyledSettingsButton = styled.div`
+  position: fixed;
+  right: 0px;
+  top: 70px;
+  opacity: 0.5;
+  z-index: 999;
+
+  .settings-icon {
+    font-size: 40px;
+    transition: transform 0.3s ease-in-out;
+  }
+`
+
 const StyledDiv = styled.div`
+  width: 300px;
+  padding: 16px;
+
   .title {
     font-weight: 600;
     display: flex;
@@ -19,6 +35,17 @@ const StyledDiv = styled.div`
     font-size: 12px;
     line-height: 25px;
     text-transform: uppercase;
+  }
+
+  .toggle-buttons {
+    border-radius: 22;
+    width: 100%;
+  }
+
+  .more-btn {
+    width: -webkit-fill-available;
+    height: 40px;
+    border-radius: 22px;
   }
 `
 
@@ -33,9 +60,10 @@ const StyledToggleButton = styled(ToggleButton)`
 const SettingsButton = () => {
   const [rotateDegree, setRotateDegree] = useState(0)
   const [anchorEl, setAnchorEl] = useState(null)
-
+  const open = Boolean(anchorEl)
+  const id = open ? 'settings-popover' : undefined
   const selectedColor = useSelector((state: RootState) => state.commonStore.sidebarColor)
-  const darkMode = useSelector((state: RootState) => state.commonStore.darkMode)
+  // const darkMode = useSelector((state: RootState) => state.commonStore.darkMode)
 
   const dispatch = useDispatch()
 
@@ -59,9 +87,6 @@ const SettingsButton = () => {
     }
   }
 
-  const open = Boolean(anchorEl)
-  const id = open ? 'settings-popover' : undefined
-
   const handleMouseLeave = () => {
     if (!open) {
       setRotateDegree(0)
@@ -69,27 +94,17 @@ const SettingsButton = () => {
   }
 
   return (
-    <>
+    <StyledSettingsButton>
       <Button
         variant='contained'
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={{
-          position: 'fixed',
-          right: '0px',
-          top: '120px',
-          backgroundColor: '#11182763',
-          zIndex: 999,
-        }}
-        aria-describedby={id}
       >
         <SettingsIcon
+          className='settings-icon'
           style={{
-            color: 'white',
-            fontSize: '40px',
-            transform: `rotate(${rotateDegree}deg)`,
-            transition: 'transform 0.3s ease-in-out',
+            transform: `rotate(${rotateDegree}deg`,
           }}
         />
       </Button>
@@ -107,15 +122,14 @@ const SettingsButton = () => {
           horizontal: 'right',
         }}
       >
-        <StyledDiv style={{ padding: 16, width: '300px', color: darkMode ? 'white' : 'black' }}>
-          <div style={{ width: '100%' }}>
+        <StyledDiv>
+          <div>
             <div className='title'>Sidebar Background</div>
             <ToggleButtonGroup
+              className='toggle-buttons'
               value={selectedColor}
               exclusive
               onChange={(_event, newColor) => handleColorChange(newColor)}
-              aria-label='select color'
-              style={{ borderRadius: 22, width: '100%' }}
             >
               {colorOptions.map((option, indx) => (
                 <StyledToggleButton
@@ -146,21 +160,12 @@ const SettingsButton = () => {
           <Divider style={{ margin: 15 }} />
           <DarkModeSwitch />
           <Divider style={{ margin: 15 }} />
-          <Button
-            key='more-options'
-            variant='outlined'
-            value='more-options'
-            style={{
-              width: '-webkit-fill-available',
-              height: 40,
-              borderRadius: 22,
-            }}
-          >
+          <Button className='more-btn' key='more-options' variant='outlined' value='more-options'>
             More Options
           </Button>
         </StyledDiv>
       </Popover>
-    </>
+    </StyledSettingsButton>
   )
 }
 

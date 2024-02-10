@@ -1,4 +1,4 @@
-import { FormLabel, Tooltip, FormHelperText } from '@mui/material'
+import { FormLabel, Tooltip, FormHelperText, Typography } from '@mui/material'
 import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 import MuiFormControl from '@mui/material/FormControl'
@@ -59,10 +59,10 @@ const InlineForm: React.FC<Props> = ({
         id={`${id}-label`}
         focused={false}
         disabled={disabled}
-        style={{ width: `${labelWidth}px`, minWidth: `${labelWidth}px`, color: 'black' }}
+        style={{ width: `${labelWidth}px`, minWidth: `${labelWidth}px` }}
       >
         <Tooltip id={`${id}-tooltip`} title={tooltip ? tooltip : ''} placement='top-start' arrow>
-          <span>{`${label} ${required ? ' *' : ''}`}</span>
+          <Typography>{`${label} ${required ? ' *' : ''}`}</Typography>
         </Tooltip>
       </FormLabel>
       <div style={{ width: '100%' }}>
