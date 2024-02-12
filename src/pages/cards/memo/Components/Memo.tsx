@@ -33,7 +33,7 @@ import { useDispatch } from 'react-redux'
 import memoStore from '@app/store/memoStore/MemoStore'
 import styled from 'styled-components'
 import SunEditor from '@app/components/common/SunEditor/SunEditor'
-import TagList, { Tag } from '@app/pages/tags/TagList'
+import TagList, { Tag } from '@app/pages/Tags/TagList'
 
 type Props = {
   listData: MemoInput

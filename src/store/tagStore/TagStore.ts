@@ -1,4 +1,4 @@
-import { Tag } from '@app/pages/tags/TagList'
+import { Tag } from '@app/pages/Tags/TagList'
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 import { Loading } from '../memoStore/MemoStore'
 

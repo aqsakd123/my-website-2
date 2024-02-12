@@ -1,4 +1,4 @@
-import { TagInput } from '@app/pages/tags/TagList'
+import { TagInput } from '@app/pages/Tags/TagList'
 import axiosInstance from '../axios'
 import { DELETE_TAG, GET_LIST_TAGS, INSERT_TAG, UPDATE_TAG } from './tag-type'
 

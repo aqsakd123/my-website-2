@@ -8,12 +8,12 @@ import SettingsButton from './SettingButton'
 import { RootState } from '@app/store/store'
 import { useSelector } from 'react-redux'
 import {
+  AccountBalanceWalletOutlined,
   AssignmentSharp,
   CalendarMonthSharp,
   EditNoteOutlined,
   RocketLaunchOutlined,
 } from '@mui/icons-material'
-import { GrTrophy } from 'react-icons/gr'
 import { GiTargeting } from 'react-icons/gi'
 import { LuBookMarked } from 'react-icons/lu'
 import { AnimationType } from '../common/AnimatedIcon'
@@ -127,11 +127,18 @@ export const linkItems: LinkItemsType[] = [
       },
     ],
   },
+  // {
+  //   id: 6,
+  //   text: 'Award',
+  //   link: '/award',
+  //   icon: <GrTrophy style={{ height: '20px', width: '20px' }} />,
+  //   animation: 'flip',
+  // },
   {
     id: 6,
-    text: 'Award',
-    link: '/award',
-    icon: <GrTrophy style={{ height: '20px', width: '20px' }} />,
+    text: 'Finance Management',
+    link: '/finance',
+    icon: <AccountBalanceWalletOutlined style={{ height: '20px', width: '20px' }} />,
     animation: 'flip',
   },
   {

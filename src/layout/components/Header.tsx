@@ -5,10 +5,13 @@ import { useContext } from 'react'
 import React from 'react'
 import Sidebar, { linkItems } from './Sidebar'
 import styled from '@emotion/styled'
-import { MenuItem, Box, IconButton, Menu, Divider } from '@mui/material'
+import { MenuItem, Box, IconButton, Menu, Divider, Button, Tooltip } from '@mui/material'
 import { Person } from '@mui/icons-material'
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
 import { loggingOut } from '@app/api/axios'
+import DialogAward from '@app/pages/AwardManagement/DialogAward'
+import { RootState } from '@app/store/store'
+import { useSelector } from 'react-redux'
 
 type HeaderProps = {
   displaySidebar: boolean
@@ -18,6 +21,20 @@ type HeaderProps = {
 const StyledMenu = styled(MenuItem)`
   width: 220px;
 `
+
+const StyledMenuCheckingPoint = styled(MenuItem)`
+  width: 220px;
+  display: flex;
+  justify-content: space-between;
+  .gift-btn {
+    width: 30px;
+    min-width: 30px;
+    height: 30px;
+    border: 1px solid darkgray;
+    font-size: 17px;
+  }
+`
+
 const StyledHeader = styled.div`
   transition: all 0.4s ease;
   height: 64px;
@@ -52,11 +69,21 @@ const Header = (props: HeaderProps) => {
   const { displaySidebar, handleChangeSideStatus } = props
   const { removeUser } = useContext(AppContext)
 
+  const { dataList } = useSelector((state: RootState) => state.awardStore)
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [dialogAwardOpen, setDialogAwardOpen] = React.useState<boolean>(false)
+
   const [title, setTitle] = React.useState<string>(
     linkItems.filter((item) => location.pathname.split('/')[1] === item?.link.replace('/', ''))[0]
       ?.text,
   )
+  const currentPoint = 2500
+  const awardList =
+    dataList
+      .filter((it) => it.awardPoint > currentPoint)
+      .sort((a, b) => a?.awardPoint - b?.awardPoint) || [] // Sort the filtered awardList by awardPoint
+  const nextCheckpoint = awardList[0]
 
   const displayMenu = Boolean(anchorEl)
 
@@ -77,8 +104,17 @@ const Header = (props: HeaderProps) => {
     }
   }
 
+  const handleOpenDialogAward = () => {
+    setDialogAwardOpen(true)
+  }
+
+  const handleCloseDialogAward = () => {
+    setDialogAwardOpen(false)
+  }
+
   return (
     <StyledHeader className='header'>
+      {dialogAwardOpen && <DialogAward onReturn={handleCloseDialogAward} />}
       <Box className='header-left'>
         <Sidebar open={displaySidebar} setTitle={setTitle} />
         <div className='title'>
@@ -110,6 +146,24 @@ const Header = (props: HeaderProps) => {
             'aria-labelledby': 'basic-button',
           }}
         >
+          <StyledMenu onClick={handleOpenDialogAward}>Manage Award</StyledMenu>
+          <StyledMenuCheckingPoint>
+            <div>
+              {currentPoint}/{nextCheckpoint?.awardPoint}
+            </div>
+            <Tooltip
+              title={
+                nextCheckpoint?.description ? (
+                  <span style={{ wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
+                    {nextCheckpoint?.description}
+                  </span>
+                ) : undefined
+              }
+              arrow
+            >
+              <Button className='gift-btn'>🎁</Button>
+            </Tooltip>
+          </StyledMenuCheckingPoint>
           <StyledMenu onClick={handleLogout}>Logout</StyledMenu>
         </Menu>
       </div>

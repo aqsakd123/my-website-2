@@ -13,6 +13,7 @@ import {
 import commonStore from './commonStore/CommonStore'
 import memoStore from './memoStore/MemoStore'
 import tagStore from './tagStore/TagStore'
+import awardStore from './awardStore/AwardStore'
 
 const rootPersistConfig = {
   key: 'root',
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   commonStore: commonStore.reducer,
   memoStore: memoStore.reducer,
   tagStore: tagStore.reducer,
+  awardStore: awardStore.reducer,
 })
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer)

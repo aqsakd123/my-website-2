@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Popconfirm } from 'antd'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import Dialog, { DialogContent } from '@app/components/common/Dialog/Dialog'
+import TextInput from '@app/components/common/TextInputField/TextInput'
 
 export type Tag = {
   id: string
@@ -43,11 +44,12 @@ const TagList: React.FC<Props> = (props: Props) => {
   const { type, currentTags, handleClose, setCurrentTags } = props
 
   const [tagFormDialogMode, setTagFormDialogMode] = useState<DialogState>('none')
+  const [tagNameSearch, setTagNameSearch] = useState<string>('')
 
   const { loadingStatus, dataList } = useSelector((state: RootState) => state.tagStore)
   const { darkMode } = useSelector((state: RootState) => state.commonStore)
 
-  const tagList = dataList || []
+  const tagList = dataList.filter((data) => data?.name?.includes(tagNameSearch)) || []
 
   const dispatch = useDispatch()
 
@@ -119,9 +121,20 @@ const TagList: React.FC<Props> = (props: Props) => {
         {tagFormDialogMode !== 'none' && (
           <TagFormDialog mode={tagFormDialogMode} onReturn={handleReturnFormDialog} />
         )}
-        <Box mb={1} mt={1} display='flex' flexDirection='row-reverse'>
-          <Button variant='outlined' onClick={handleClickAddNew}>
-            Add new
+        <Box mb={1} mt={1} display='flex'>
+          <div style={{ flexGrow: 1, marginRight: '10px' }}>
+            <TextInput
+              variant='filled'
+              id='search-name'
+              name='name'
+              label='Search Name'
+              value={tagNameSearch}
+              onChange={setTagNameSearch}
+              fullWidth
+            />
+          </div>
+          <Button variant='outlined' onClick={handleClickAddNew} sx={{ height: '40px' }}>
+            Add tag
           </Button>
         </Box>
         <ToggleButtonGroup orientation='vertical' style={{ width: '100%' }}>

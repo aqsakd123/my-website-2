@@ -2,13 +2,13 @@ import Auth from '@app/layout/Auth'
 import Default from '@app/layout/Default'
 import Login from '@app/pages/login/Login'
 import E404 from '@app/pages/error/E404'
-import Home from '@app/pages/home/Home'
-import Target from '@app/pages/home/Target'
-import Next7Days from '@app/pages/home/Next7Days'
-import Workspaces from '@app/pages/to-do-list/workspaces/Workspaces'
-import Award from '@app/pages/award/Award'
+import Home from '@app/pages/Home/Home'
+import Target from '@app/pages/Home/Target'
+import Next7Days from '@app/pages/Home/Next7Days'
+import Workspaces from '@app/pages/ToDoList/Workspaces'
 import MemoList from '@app/pages/cards/memo/MemoList'
 import StudyList from '@app/pages/cards/StudyCard/StudyList'
+import AwardList from '@app/pages/AwardManagement/AwardList'
 
 export type RouteInfo = {
   path: string
@@ -89,14 +89,25 @@ export const initRoutes = (): RouteInfo[] => {
         },
       ],
     },
+    // {
+    //   path: '/award',
+    //   layout: <Default />,
+    //   roles: ['any'],
+    //   children: [
+    //     {
+    //       path: '',
+    //       element: <AwardList />,
+    //     },
+    //   ],
+    // },
     {
-      path: '/award',
+      path: '/finance',
       layout: <Default />,
       roles: ['any'],
       children: [
         {
           path: '',
-          element: <Award />,
+          element: <AwardList />,
         },
       ],
     },
