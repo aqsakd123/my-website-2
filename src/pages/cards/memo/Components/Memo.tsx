@@ -10,8 +10,15 @@ import {
   TextField,
   Tooltip,
   Button,
+  Chip,
 } from '@mui/material'
-import { Add, CloseSharp, DragIndicator, MoreHorizOutlined } from '@mui/icons-material'
+import {
+  Add,
+  AddCircleOutline,
+  CloseSharp,
+  DragIndicator,
+  MoreHorizOutlined,
+} from '@mui/icons-material'
 import AddEditDialog from '../Dialog/AddEditDialog'
 import TextInput from '@app/components/common/TextInputField/TextInput'
 import useConfirm from '@app/components/common/ConfirmDialog/useConfirm'
@@ -26,6 +33,7 @@ import { useDispatch } from 'react-redux'
 import memoStore from '@app/store/memoStore/MemoStore'
 import styled from 'styled-components'
 import SunEditor from '@app/components/common/SunEditor/SunEditor'
+import TagList, { Tag } from '@app/pages/tags/TagList'
 
 type Props = {
   listData: MemoInput
@@ -51,7 +59,7 @@ const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type:
     font-weight: 600;
     border-radius: 5px;
     font-size: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     padding: 0px 8px;
     align-items: center;
 
@@ -70,6 +78,14 @@ const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type:
         white-space: pre-line;
         word-break: break-word;
       }
+    }
+  }
+
+  .tag-container {
+    margin-bottom: 5px;
+    .tag-icon {
+      margin-left: 5px;
+      margin-right: 5px;
     }
   }
 
@@ -176,6 +192,7 @@ const Memo: React.FC<Props> = (props: Props) => {
   const [colorData, setColorData] = useState<string>(color)
   const [pinnedData, setPinnedData] = useState<boolean>(status === 2)
   const [isDirty, setIsDirty] = useState<boolean>(false)
+  const [tagLists, setTagList] = useState<Tag[]>([])
 
   const [selectedTabIndex, setSelectedTabIndex] = useState<string | undefined>(tabs[0].prefixId)
   const [selectedEditTab, setSelectedEditTab] = useState<string | undefined>(undefined)
@@ -185,6 +202,7 @@ const Memo: React.FC<Props> = (props: Props) => {
 
   const [editMode, setEditMode] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [isOpenDialogTag, setOpenDialogTag] = useState(false)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const confirm = useConfirm()
@@ -336,6 +354,14 @@ const Memo: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const openTagListDialog = () => {
+    setOpenDialogTag(true)
+  }
+
+  const closeTagListDialog = () => {
+    setOpenDialogTag(false)
+  }
+
   return (
     <StyledGrid
       item
@@ -344,6 +370,14 @@ const Memo: React.FC<Props> = (props: Props) => {
       $editMode={editMode}
       $type={type}
     >
+      {isOpenDialogTag && (
+        <TagList
+          currentTags={tagLists}
+          handleClose={closeTagListDialog}
+          setCurrentTags={setTagList}
+          type='study'
+        />
+      )}
       <Box
         className='containe-box'
         sx={{
@@ -382,6 +416,34 @@ const Memo: React.FC<Props> = (props: Props) => {
           {editMode && <MenuItem onClick={handleClickCancel}>Cancel</MenuItem>}
           <MenuItem onClick={handleClickDelete}>Delete</MenuItem>
         </Menu>
+      </Box>
+      <Box className='tag-container'>
+        {tagLists.map((tag) => (
+          <Tooltip
+            title={
+              tag.description ? (
+                <span style={{ wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
+                  {tag.description}
+                </span>
+              ) : undefined
+            }
+            arrow
+          >
+            <Chip
+              className='tag-icon'
+              size='small'
+              label={tag.name}
+              sx={{ backgroundColor: tag.color || 'white' }}
+            />
+          </Tooltip>
+        ))}
+        <Chip
+          color='warning'
+          size='small'
+          label='Add Tag'
+          icon={<AddCircleOutline />}
+          onClick={openTagListDialog}
+        />
       </Box>
       <Box className='tab-container'>
         {type === 'study' && (

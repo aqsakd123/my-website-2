@@ -12,6 +12,8 @@ import { useUnmount } from 'react-use'
 import { IconName } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Popconfirm } from 'antd'
+import TaskAltIcon from '@mui/icons-material/TaskAlt'
+import Dialog, { DialogContent } from '@app/components/common/Dialog/Dialog'
 
 export type Tag = {
   id: string
@@ -32,10 +34,13 @@ type TagBase = {
 
 type Props = {
   type: string
+  currentTags: Tag[]
+  setCurrentTags: (value: Tag[]) => void
+  handleClose: () => void
 }
 
 const TagList: React.FC<Props> = (props: Props) => {
-  const { type } = props
+  const { type, currentTags, handleClose, setCurrentTags } = props
 
   const [tagFormDialogMode, setTagFormDialogMode] = useState<DialogState>('none')
 
@@ -71,7 +76,8 @@ const TagList: React.FC<Props> = (props: Props) => {
     dispatch(tagStore.actions.clearAll())
   })
 
-  const handleClickEditTag = (item: Tag) => {
+  const handleClickEditTag = (event: any, item: Tag) => {
+    event.stopPropagation()
     dispatch(tagStore.actions.setEditItem(item))
     setTagFormDialogMode('edit')
   }
@@ -92,74 +98,97 @@ const TagList: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const handleCurrentTagList = (value: Tag) => {
+    // Check if the tag exists in the tagList
+    const tagIndex = currentTags.map((it) => it?.id).indexOf(value?.id)
+
+    if (tagIndex !== -1) {
+      // If the tag exists, remove it from the tagList
+      const updatedTagList = [...currentTags]
+      updatedTagList.splice(tagIndex, 1)
+      setCurrentTags(updatedTagList)
+    } else {
+      // If the tag does not exist, add it to the tagList
+      setCurrentTags([...currentTags, value])
+    }
+  }
+
   return (
-    <>
-      {tagFormDialogMode !== 'none' && (
-        <TagFormDialog mode={tagFormDialogMode} onReturn={handleReturnFormDialog} />
-      )}
-      <Box mb={1} mt={1} display='flex' flexDirection='row-reverse'>
-        <Button variant='outlined' onClick={handleClickAddNew}>
-          Add new
-        </Button>
-      </Box>
-      <ToggleButtonGroup orientation='vertical' style={{ width: '100%' }}>
-        {tagList.map((tag) => {
-          const bgColor = tag.color ? tag.color : darkMode ? '#ddd1d1' : '#434141'
-          return (
-            <Tooltip
-              title={
-                tag.description ? (
-                  <span style={{ wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
-                    {tag.description}
-                  </span>
-                ) : undefined
-              }
-              arrow
-            >
-              <ToggleButton
-                value={tag.id}
-                style={{
-                  backgroundColor: bgColor,
-                  color: ColorUtils.getContrastingColor(bgColor),
-                }}
+    <Dialog open onClickReturn={handleClose} title='Tag List'>
+      <DialogContent>
+        {tagFormDialogMode !== 'none' && (
+          <TagFormDialog mode={tagFormDialogMode} onReturn={handleReturnFormDialog} />
+        )}
+        <Box mb={1} mt={1} display='flex' flexDirection='row-reverse'>
+          <Button variant='outlined' onClick={handleClickAddNew}>
+            Add new
+          </Button>
+        </Box>
+        <ToggleButtonGroup orientation='vertical' style={{ width: '100%' }}>
+          {tagList.map((tag) => {
+            const bgColor = tag.color ? tag.color : darkMode ? '#ddd1d1' : '#434141'
+            return (
+              <Tooltip
+                title={
+                  tag.description ? (
+                    <span style={{ wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
+                      {tag.description}
+                    </span>
+                  ) : undefined
+                }
+                arrow
               >
-                <div
+                <ToggleButton
+                  value={tag.id}
                   style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    backgroundColor: bgColor,
+                    color: ColorUtils.getContrastingColor(bgColor),
                   }}
+                  onClick={() => handleCurrentTagList(tag)}
                 >
-                  <div>
-                    {tag?.icon && (
-                      <FontAwesomeIcon
-                        icon={['fas', tag?.icon as IconName]}
-                        color={ColorUtils.getContrastingColor(bgColor)}
-                      />
-                    )}
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <div>
+                      {tag?.icon && (
+                        <FontAwesomeIcon
+                          icon={['fas', tag?.icon as IconName]}
+                          color={ColorUtils.getContrastingColor(bgColor)}
+                        />
+                      )}
+                    </div>
+                    <span style={{ fontWeight: 'bold' }}>{tag.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      {currentTags.map((it) => it?.id).includes(tag?.id) && (
+                        <Button variant='text'>
+                          <TaskAltIcon />
+                        </Button>
+                      )}
+                      <Edit fontSize='small' onClick={(e) => handleClickEditTag(e, tag)} />
+                      <Popconfirm
+                        title='Are you sure you want to delete this tag?'
+                        onConfirm={() => handleClickDeleteTag(tag)}
+                        okText='Yes'
+                        cancelText='No'
+                      >
+                        <Button variant='text' onClick={(e) => e.stopPropagation()}>
+                          <Close />
+                        </Button>
+                      </Popconfirm>
+                    </div>
                   </div>
-                  <span style={{ fontWeight: 'bold' }}>{tag.name}</span>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <Edit fontSize='small' onClick={() => handleClickEditTag(tag)} />
-                    <Popconfirm
-                      title='Are you sure you want to delete this tag?'
-                      onConfirm={() => handleClickDeleteTag(tag)}
-                      okText='Yes'
-                      cancelText='No'
-                    >
-                      <Button variant='text' onClick={(e) => e.stopPropagation()}>
-                        <Close />
-                      </Button>
-                    </Popconfirm>
-                  </div>
-                </div>
-              </ToggleButton>
-            </Tooltip>
-          )
-        })}
-      </ToggleButtonGroup>
-    </>
+                </ToggleButton>
+              </Tooltip>
+            )
+          })}
+        </ToggleButtonGroup>
+      </DialogContent>
+    </Dialog>
   )
 }
 
