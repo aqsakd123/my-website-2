@@ -1,3 +1,4 @@
+import { Category } from '@app/pages/CategoryManagement/CategoryList'
 import axiosInstance from '../axios'
 import {
   CHANGE_STATUS_MEMO,
@@ -14,6 +15,7 @@ export type Specfication = {
   name?: string
   tags?: [string]
   type: string
+  category?: Category
 }
 
 export const fetchMemoList = async (specification?: Specfication) => {

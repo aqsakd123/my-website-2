@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Box, Button, Tooltip } from '@mui/material'
 import { Close, Edit } from '@mui/icons-material'
 import AwardFormDialog from './Dialog/AwardFormDialog'
 import { DialogState } from '@app/store/commonStore/CommonStore'
 import { useDispatch, useSelector } from 'react-redux'
 import awardStore from '@app/store/awardStore/AwardStore'
-import { deleteAward, fetchAwardList } from '@app/api/award/award-api'
+import { deleteAward } from '@app/api/award/award-api'
 import { RootState } from '@app/store/store'
 import { useUnmount } from 'react-use'
 import { Popconfirm } from 'antd'
@@ -73,7 +73,7 @@ const AwardList: React.FC = () => {
   const [awardFormDialogMode, setAwardFormDialogMode] = useState<DialogState>('none')
   const [awardNameSearch, setAwardNameSearch] = useState<string>('')
 
-  const { loadingStatus, dataList } = useSelector((state: RootState) => state.awardStore)
+  const { dataList } = useSelector((state: RootState) => state.awardStore)
   const { darkMode } = useSelector((state: RootState) => state.commonStore)
 
   const awardList =
@@ -82,24 +82,6 @@ const AwardList: React.FC = () => {
       .sort((a, b) => a?.awardPoint - b?.awardPoint) || [] // Sort the filtered awardList by awardPoint
 
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    const handleFetchData = async () => {
-      try {
-        dispatch(awardStore.actions.setLoadingStatus('Loading'))
-        const fetchedData = await fetchAwardList()
-        dispatch(awardStore.actions.setAwardList(fetchedData || []))
-      } catch (error) {
-        console.log(error)
-      } finally {
-        dispatch(awardStore.actions.setLoadingStatus('Loaded'))
-      }
-    }
-
-    if (loadingStatus === 'NotLoad') {
-      handleFetchData()
-    }
-  }, [loadingStatus])
 
   useUnmount(() => {
     dispatch(awardStore.actions.clearAll())
@@ -151,7 +133,7 @@ const AwardList: React.FC = () => {
       <Box>
         {awardList.map((award) => {
           return (
-            <StyledItem $color={award.color} $darkMode={darkMode}>
+            <StyledItem $color={award.color} $darkMode={darkMode} key={award.id}>
               <Tooltip
                 title={
                   award.description ? (

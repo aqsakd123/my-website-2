@@ -2,7 +2,7 @@ import { Button, Grid } from '@mui/material'
 import { useEffect, useState } from 'react'
 import Memo from '../memo/Components/Memo'
 import { Specfication, fetchMemoList, insertMemo } from '@app/api/memo/memo-api'
-import AddEditDialog from '../memo/Dialog/AddEditDialog'
+import AddEditDialog from '../memo/Dialog/AddEditTabDialog'
 import { MemoInput, TabDataInput } from '@app/api/memo/memo-type'
 import { RootState } from '@app/store/store'
 import { useSelector } from 'react-redux'
@@ -11,6 +11,7 @@ import { useUnmount } from 'react-use'
 import memoStore from '@app/store/memoStore/MemoStore'
 import React from 'react'
 import SearchButton from '../memo/Components/SearchButton'
+import Loading from '@app/components/common/Loading/Loading'
 
 type Props = {
   screenId?: string
@@ -55,21 +56,32 @@ const StudyList: React.FC<Props> = () => {
   }
 
   const handleAddStudyCard = async (value: TabDataInput) => {
-    const addMemo: MemoInput = {
-      color: '#FFFFFF',
-      status: 1,
-      type: 'study',
-      name: value.tabName,
-      tabCardList: [
-        {
-          tabContent: '',
-          tabName: 'Default',
-        },
-      ],
+    try {
+      let category
+      if (specification.category) {
+        category = specification.category
+      }
+      const addMemo: MemoInput = {
+        color: '#FFFFFF',
+        status: 1,
+        type: 'study',
+        name: value.tabName,
+        category,
+        qaList: [],
+        tags: [],
+        tabCardList: [
+          {
+            tabContent: '',
+            tabName: 'Default',
+          },
+        ],
+      }
+      await insertMemo(addMemo)
+      dispatch(memoStore.actions.setLoadingStatus('NotLoad'))
+      handleDialogClose()
+    } catch (e) {
+      console.error(e)
     }
-    await insertMemo(addMemo)
-    dispatch(memoStore.actions.setLoadingStatus('NotLoad'))
-    handleDialogClose()
   }
 
   const handleSetSpecification = (item: Specfication) => {
@@ -77,12 +89,9 @@ const StudyList: React.FC<Props> = () => {
     dispatch(memoStore.actions.setLoadingStatus('NotLoad'))
   }
 
-  if (loadingStatus === 'Loading' || loadingStatus === 'NotLoad') {
-    return <>...Loading</>
-  }
-
   return (
     <Grid container spacing={2}>
+      {loadingStatus !== 'Loaded' && <Loading />}
       {isDialogOpen && (
         <AddEditDialog
           handleDialogClose={handleDialogClose}

@@ -38,7 +38,19 @@ axiosInstance.interceptors.request.use(async (request: any) => {
 })
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Handle success case
+    if (response?.config?.url?.startsWith('/graphql') && response.data.errors) {
+      // Handle GraphQL errors
+      return Promise.reject({
+        response: {
+          status: 400,
+          data: response.data,
+        },
+      })
+    }
+    return response
+  },
   async (error) => {
     if (error.response?.status === 401 && error.response?.data?.message === 'JWT.EXPIRED') {
       // Token expired, attempt to refresh

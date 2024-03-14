@@ -14,6 +14,11 @@ import commonStore from './commonStore/CommonStore'
 import memoStore from './memoStore/MemoStore'
 import tagStore from './tagStore/TagStore'
 import awardStore from './awardStore/AwardStore'
+import financeStore from './financeStore/FinanceStore'
+import categoryStore from './categoryStore/CategoryStore'
+import taskListStore from './taskListStore/TaskListStore'
+import subTaskStore from './subTaskStore/SubTaskStore'
+import workSpaceStore from './workSpaceStore/WorkSpaceStore'
 
 const rootPersistConfig = {
   key: 'root',
@@ -26,6 +31,11 @@ const rootReducer = combineReducers({
   memoStore: memoStore.reducer,
   tagStore: tagStore.reducer,
   awardStore: awardStore.reducer,
+  financeStore: financeStore.reducer,
+  categoryStore: categoryStore.reducer,
+  tasklistStore: taskListStore.reducer,
+  subTaskStore: subTaskStore.reducer,
+  workSpaceStore: workSpaceStore.reducer,
 })
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer)

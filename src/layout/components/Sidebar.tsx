@@ -18,6 +18,7 @@ import { GiTargeting } from 'react-icons/gi'
 import { LuBookMarked } from 'react-icons/lu'
 import { AnimationType } from '../common/AnimatedIcon'
 import { tokens } from '@app/config/ThemeProvider'
+import { useFontAwesomeIconPack } from '@app/components/common/IconPicker/hooks/useCollectIconPack'
 
 export const drawerWidth = 240
 type SidebarProps = {
@@ -38,6 +39,7 @@ export type LinkItemsType = {
 
 const StyledDrawer = styled(Drawer)<{ $isOpen: boolean }>`
   ${({ $isOpen }) => ($isOpen ? `width: ${drawerWidth}px;` : 'width: 40px;')}
+  background-color: transparent;
 
   & .MuiDrawer-paper {
     ${({ $isOpen }) => ($isOpen ? `width: ${drawerWidth}px;` : 'width: 40px;')}
@@ -51,8 +53,8 @@ const StyledDrawer = styled(Drawer)<{ $isOpen: boolean }>`
     left: 20px;
     flex-shrink: 0;
     border: none;
-    border-radius: 4px;
-    box-shadow: 4px;
+    border-radius: 20px;
+    box-shadow: 8px;
   }
 
   .MuiList-root {
@@ -114,26 +116,7 @@ export const linkItems: LinkItemsType[] = [
     text: 'Workspaces',
     link: '/work-spaces',
     icon: <RocketLaunchOutlined />,
-    children: [
-      {
-        id: 2.1,
-        text: 'Project 1',
-        link: '/project1',
-      },
-      {
-        id: 2.2,
-        text: 'Project 2',
-        link: '/project2',
-      },
-    ],
   },
-  // {
-  //   id: 6,
-  //   text: 'Award',
-  //   link: '/award',
-  //   icon: <GrTrophy style={{ height: '20px', width: '20px' }} />,
-  //   animation: 'flip',
-  // },
   {
     id: 6,
     text: 'Finance Management',
@@ -161,6 +144,7 @@ const Sidebar = (props: SidebarProps) => {
 
   const selectedColor = useSelector((state: RootState) => state.commonStore.sidebarColor)
   const darkMode = useSelector((state: RootState) => state.commonStore.darkMode)
+  useFontAwesomeIconPack()
 
   const borderColor = tokens(darkMode).blueAccent[300]
   function handleChooseLink(item: LinkItemsType): void {
@@ -172,9 +156,10 @@ const Sidebar = (props: SidebarProps) => {
       <StyledDrawer variant='persistent' anchor='left' $isOpen={open} open>
         <List
           className='list'
-          style={{
+          sx={{
             backgroundColor: selectedColor,
             border: open ? `4px solid ${borderColor}` : 'none',
+            borderRadius: '20px',
           }}
         >
           {linkItems.map((item) => (

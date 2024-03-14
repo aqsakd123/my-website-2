@@ -114,6 +114,8 @@ const CheckboxInner: React.FC<CheckboxType> = (props: CheckboxType) => {
               render={({ field: { onChange: handleChange, value } }) => (
                 <InnerCheckbox
                   {...props}
+                  value={value}
+                  checked={value}
                   onChange={(newChecked) => {
                     handleChange(newChecked)
                     if (onChange) {
@@ -138,6 +140,7 @@ const CheckboxInner: React.FC<CheckboxType> = (props: CheckboxType) => {
           <InnerCheckbox
             {...props}
             value={value}
+            checked={value}
             onChange={(newChecked) => {
               handleChange(newChecked)
               if (onChange) {

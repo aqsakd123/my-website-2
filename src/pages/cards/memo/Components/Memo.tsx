@@ -19,7 +19,7 @@ import {
   DragIndicator,
   MoreHorizOutlined,
 } from '@mui/icons-material'
-import AddEditDialog from '../Dialog/AddEditDialog'
+import AddEditDialog from '../Dialog/AddEditTabDialog'
 import TextInput from '@app/components/common/TextInputField/TextInput'
 import useConfirm from '@app/components/common/ConfirmDialog/useConfirm'
 import ColorPalleter from './ColorPallete'
@@ -29,11 +29,14 @@ import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd'
 import { StrictModeDroppable } from '@app/components/common/StrictModeDroppable/StrictModeDroppable'
 import { MemoInput, TabDataInput } from '@app/api/memo/memo-type'
 import { changeStatus, deleteMemo, updateMemo } from '@app/api/memo/memo-api'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import memoStore from '@app/store/memoStore/MemoStore'
 import styled from 'styled-components'
 import SunEditor from '@app/components/common/SunEditor/SunEditor'
 import TagList, { Tag } from '@app/pages/Tags/TagList'
+import QuesAndAnsFormDialog from '../Dialog/QuesAndAnsFormDialog'
+import QuesAndAnsList, { QuesAndAns } from '../../StudyCard/QuesAndAnsList'
+import { RootState } from '@app/store/store'
 
 type Props = {
   listData: MemoInput
@@ -43,6 +46,8 @@ type Props = {
 type TabType = TabDataInput & {
   prefixId: string
 }
+
+type DialogMode = 'edit' | 'add' | 'list' | 'none'
 
 const StyledDraggable = styled(Box)`
   height: 100%;
@@ -62,6 +67,8 @@ const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type:
     margin-bottom: 5px;
     padding: 0px 8px;
     align-items: center;
+    box-shadow: 2px 2px #888888;
+    border: 1px solid #8080802b;
 
     & .MuiInputBase-input {
       color: ${({ $colorData }) => ColorUtils.getContrastingColor($colorData)};
@@ -92,6 +99,8 @@ const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type:
   .tab-container {
     border-radius: 8px;
     display: flex;
+    box-shadow: 2px 2px #888888;
+    border: 1px solid #8080802b;
 
     .tab-item {
       border-radius: 8px 0px 0px 8px;
@@ -154,7 +163,12 @@ const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type:
       color: ${({ $colorData }) => ColorUtils.getContrastingColor($colorData)};
       font-weight: 100;
     }
-
+    .display-tab-content {
+      padding: 8px;
+      & .p {
+        margin: 5px 0px;
+      }
+    }
     .MuiInputBase-root {
       border-radius: ${({ $type }) => ($type === 'memo' ? '8px 8px 0px 0px' : '0px 8px 0px 0px')};
     }
@@ -164,11 +178,14 @@ const StyledGrid = styled(Grid)<{ $colorData: string; $editMode: boolean; $type:
       border: 1px solid #6d6d6d;
     }
 
-    .sun-editor-editable blockquote {
-      border: solid #1100ff;
+    blockquote {
+      border: solid #7673a9;
       color: wheat;
       background-color: #3b3737;
       border-width: 0 0 0 5px;
+
+      margin-inline-start: 0px;
+      padding-left: 10px;
     }
   }
 
@@ -193,6 +210,7 @@ const Memo: React.FC<Props> = (props: Props) => {
   const [pinnedData, setPinnedData] = useState<boolean>(status === 2)
   const [isDirty, setIsDirty] = useState<boolean>(false)
   const [tagLists, setTagList] = useState<Tag[]>([])
+  const [qaList, setQAList] = useState<QuesAndAns[]>(listData.qaList)
 
   const [selectedTabIndex, setSelectedTabIndex] = useState<string | undefined>(tabs[0].prefixId)
   const [selectedEditTab, setSelectedEditTab] = useState<string | undefined>(undefined)
@@ -203,13 +221,29 @@ const Memo: React.FC<Props> = (props: Props) => {
   const [editMode, setEditMode] = useState(false)
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [isOpenDialogTag, setOpenDialogTag] = useState(false)
+  const [isOpenDialogQA, setOpenDialogQA] = useState<DialogMode>('none')
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+
+  const { loadingStatus } = useSelector((state: RootState) => state.memoStore)
 
   const confirm = useConfirm()
   const dispatch = useDispatch()
 
+  React.useEffect(() => {
+    setPinnedData(status === 2)
+  }, [status])
+
+  React.useEffect(() => {
+    // when loading status of memo change, reload state qa list
+    if (loadingStatus === 'Loaded') {
+      setQAList(listData.qaList)
+      setTagList(listData.tags)
+    }
+  }, [loadingStatus])
+
   const onSubmit = (data: TabType) => {
-    setTabs((prevTabs) => [...prevTabs, data])
+    setTabs((prevTabs) => [...prevTabs, { ...data, position: prevTabs.length + 1 }])
     setDialogOpen(false)
   }
 
@@ -281,6 +315,10 @@ const Memo: React.FC<Props> = (props: Props) => {
     setAnchorEl(null)
   }
 
+  const handleChangeDialogQAMode = (mode: DialogMode) => {
+    setOpenDialogQA(mode)
+  }
+
   const handleClickCancel = async () => {
     if (
       isDirty &&
@@ -293,6 +331,8 @@ const Memo: React.FC<Props> = (props: Props) => {
     setTabs(tabCardList?.map((tab) => ({ ...tab, prefixId: tab.id || `${new Date().getTime()}` })))
     setSelectedEditTab(undefined)
     setSelectedTabIndex(tabs[0]?.prefixId)
+    setQAList(listData.qaList)
+    setTagList(listData.tags)
   }
 
   const colorStyle = {
@@ -317,22 +357,36 @@ const Memo: React.FC<Props> = (props: Props) => {
   }
 
   const handleClickSave = async () => {
-    const { type, id } = listData
-    const newData: MemoInput = {
-      color: colorData,
-      status: pinnedData ? 2 : 1,
-      type,
-      id,
-      name: nameData,
-      tabCardList: tabs.map((tab) => {
-        const { id, tabContent, position, tabName } = tab
-        return { id, tabContent, position, tabName }
-      }),
-    }
-
-    if (listData.id) {
-      await updateMemo(listData.id, newData)
-      dispatch(memoStore.actions.setLoadingStatus('NotLoad'))
+    try {
+      const { type, id } = listData
+      const newData: MemoInput = {
+        color: colorData,
+        status: pinnedData ? 2 : 1,
+        type,
+        id,
+        name: nameData,
+        tabCardList: tabs.map((tab) => {
+          const { id, tabContent, position, tabName } = tab
+          return { id, tabContent, position, tabName }
+        }),
+        qaList: qaList.map((qa) => {
+          const { id, answer, question } = qa
+          return { id, answer, question }
+        }),
+        tags: tagLists.map((tag) => {
+          const { id, description, name, status, color, icon, type } = tag
+          return { id, description, name, status, color, icon, type }
+        }),
+      }
+      if (listData.id) {
+        await updateMemo(listData.id, newData)
+        dispatch(memoStore.actions.setLoadingStatus('NotLoad'))
+        setSelectedEditTab(undefined)
+        setSelectedTabIndex(tabs[0]?.prefixId)
+        setEditMode(false)
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -354,6 +408,10 @@ const Memo: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const handleChangeQAListMemo = (value: QuesAndAns[]) => {
+    setQAList(value)
+  }
+
   const openTagListDialog = () => {
     setOpenDialogTag(true)
   }
@@ -370,12 +428,39 @@ const Memo: React.FC<Props> = (props: Props) => {
       $editMode={editMode}
       $type={type}
     >
+      {isDialogOpen && (
+        <AddEditDialog
+          handleDialogClose={handleDialogClose}
+          handleSubmit={onSubmit}
+          tabs={tabs}
+          mode='tab'
+        />
+      )}
       {isOpenDialogTag && (
         <TagList
           currentTags={tagLists}
           handleClose={closeTagListDialog}
           setCurrentTags={setTagList}
           type='study'
+        />
+      )}
+      {isOpenDialogQA === 'add' && (
+        <QuesAndAnsFormDialog
+          parent={listData}
+          memoEditMode={editMode}
+          mode='add'
+          onReturn={() => setOpenDialogQA('none')}
+          dataList={qaList}
+          changeQuesAnsState={handleChangeQAListMemo}
+        />
+      )}
+      {isOpenDialogQA === 'list' && (
+        <QuesAndAnsList
+          parent={listData}
+          dataList={qaList}
+          editMode={editMode}
+          handleClose={() => setOpenDialogQA('none')}
+          changeQuesAnsState={handleChangeQAListMemo}
         />
       )}
       <Box
@@ -414,6 +499,8 @@ const Memo: React.FC<Props> = (props: Props) => {
           {!editMode && <MenuItem onClick={handleEditModeToggle}>Edit</MenuItem>}
           {editMode && <MenuItem onClick={handleClickSave}>Save</MenuItem>}
           {editMode && <MenuItem onClick={handleClickCancel}>Cancel</MenuItem>}
+          <MenuItem onClick={() => handleChangeDialogQAMode('add')}>Add QA</MenuItem>
+          <MenuItem onClick={() => handleChangeDialogQAMode('list')}>View QA</MenuItem>
           <MenuItem onClick={handleClickDelete}>Delete</MenuItem>
         </Menu>
       </Box>
@@ -437,19 +524,21 @@ const Memo: React.FC<Props> = (props: Props) => {
             />
           </Tooltip>
         ))}
-        <Chip
-          color='warning'
-          size='small'
-          label='Add Tag'
-          icon={<AddCircleOutline />}
-          onClick={openTagListDialog}
-        />
+        {editMode && (
+          <Chip
+            color='warning'
+            size='small'
+            label='Add Tag'
+            icon={<AddCircleOutline />}
+            onClick={openTagListDialog}
+          />
+        )}
       </Box>
       <Box className='tab-container'>
         {type === 'study' && (
           <Box alignItems='center'>
             <DragDropContext onDragEnd={onDragEnd}>
-              <StrictModeDroppable droppableId='tabs' direction='horizontal'>
+              <StrictModeDroppable droppableId='tabs' direction='vertical'>
                 {(provided) => (
                   <StyledDraggable ref={provided.innerRef} {...provided.droppableProps}>
                     <Tabs
@@ -556,15 +645,23 @@ const Memo: React.FC<Props> = (props: Props) => {
                 ...colorStyle,
               }}
             >
-              <Box className='sun-editor-item'>
-                <SunEditor
-                  name='tab-content'
-                  onChange={updateTabsContent}
-                  setContents={tab.tabContent}
-                  // readOnly={!editMode}
-                  height='410px'
-                />
-              </Box>
+              {index === tabIdx && (
+                <Box className='sun-editor-item'>
+                  {editMode ? (
+                    <SunEditor
+                      name='tab-content'
+                      onChange={updateTabsContent}
+                      setContents={tab.tabContent}
+                      height='450px'
+                    />
+                  ) : (
+                    <Box
+                      className='display-tab-content'
+                      dangerouslySetInnerHTML={{ __html: tab.tabContent }}
+                    />
+                  )}
+                </Box>
+              )}
               {editMode && (
                 <Box className='color-palette'>
                   <ColorPalleter onChange={updateTabsColors} value={colorData} />
@@ -573,14 +670,6 @@ const Memo: React.FC<Props> = (props: Props) => {
             </Box>
           )
         })}
-        {isDialogOpen && (
-          <AddEditDialog
-            handleDialogClose={handleDialogClose}
-            handleSubmit={onSubmit}
-            tabs={tabs}
-            mode='tab'
-          />
-        )}
       </Box>
     </StyledGrid>
   )

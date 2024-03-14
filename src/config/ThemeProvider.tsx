@@ -9,6 +9,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { useSelector } from 'react-redux'
 import { RootState } from '@app/store/store'
+import ConfigProvider from 'antd/es/config-provider'
+import { theme } from 'antd'
 
 export const BreakPointsXS = 0
 export const BreakPointsSM = 760
@@ -209,6 +211,7 @@ export const themeSettings = (darkMode: boolean): ThemeOptions => {
         styleOverrides: {
           root: {
             fontWeight: 'bold',
+            height: 'fit-content',
           },
           outlined: {
             border: `2px solid ${colors.blueAccent[300]}`,
@@ -230,12 +233,18 @@ const ThemeProvider: React.FC<Props> = ({ children }: Props) => {
   const muiTheme = createTheme(themeSettings(darkMode))
 
   return (
-    <StyledThemeProvider theme={muiTheme}>
-      <CssBaseline />
-      <SnackbarProvider>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>{children}</LocalizationProvider>
-      </SnackbarProvider>
-    </StyledThemeProvider>
+    <ConfigProvider
+      theme={{
+        algorithm: darkMode ? theme.darkAlgorithm : undefined,
+      }}
+    >
+      <StyledThemeProvider theme={muiTheme}>
+        <CssBaseline />
+        <SnackbarProvider>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>{children}</LocalizationProvider>
+        </SnackbarProvider>
+      </StyledThemeProvider>
+    </ConfigProvider>
   )
 }
 

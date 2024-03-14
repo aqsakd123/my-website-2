@@ -1,5 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit'
 
+export type Loading = 'NotLoad' | 'Loaded' | 'Loading' | 'Error'
+
 export const colorOptions = [
   { id: 0, color: '#f9e9e9' },
   { id: 1, color: '#e14eca' },

@@ -8,10 +8,15 @@ import { useFontAwesomeIconPack } from './hooks/useCollectIconPack'
 
 export type ReactIconPickerProps = {
   value?: string
+  id: string
   onChange?: (value: string) => void
 }
 
-const IconPickerInner = ({ value, onChange }: ReactIconPickerProps) => {
+const IconPickerInner: React.FC<ReactIconPickerProps> = ({
+  value,
+  onChange,
+  id,
+}: ReactIconPickerProps) => {
   const [searchText, setSearchText] = useState('')
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const iconPack = useFontAwesomeIconPack()
@@ -27,6 +32,7 @@ const IconPickerInner = ({ value, onChange }: ReactIconPickerProps) => {
   return (
     <>
       <TextField
+        id={id}
         fullWidth
         placeholder='Select an icon'
         value={value}

@@ -31,6 +31,7 @@ const StyledDefault = styled.div`
     min-height: 100%;
     transition: all 0.4s ease;
     padding-bottom: 20px;
+    overflow: auto;
   }
 
   .cover-img {

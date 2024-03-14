@@ -1,15 +1,17 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import styled from '@emotion/styled'
 import { Box, ListItem, ListItemButton, Tooltip } from '@mui/material'
 import { LinkItemsType } from '../components/Sidebar'
-import { ReactFragment, ReactNode, useState } from 'react'
+import { ReactFragment, ReactNode, useEffect, useState } from 'react'
 import { keyframes, styled as cStyled } from 'styled-components'
 import { RootState } from '@app/store/store'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import ColorUtils from '@app/helpers/ColorUtils'
 import { ArrowDropDownSharp } from '@mui/icons-material'
 import AnimatedIcon from './AnimatedIcon'
+import { fetchWorkSpaceList } from '@app/api/workSpace/work-space-api'
+import workSpaceStore from '@app/store/workSpaceStore/WorkSpaceStore'
 
 const StyledLink = styled(Box)<{ $hideMode: boolean; $isSelected: boolean; $sidebarColor: string }>`
   width: 100%;
@@ -33,6 +35,9 @@ const StyledLink = styled(Box)<{ $hideMode: boolean; $isSelected: boolean; $side
 
   .list-text {
     font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .styled-linked-item {
@@ -95,10 +100,37 @@ type Props = {
 const IconLinkList = (props: Props) => {
   const { handleClick, item, isOpen } = props
 
-  const { icon, children } = item
+  const { icon, id: linkId } = item
   const [openHide, setOpenHide] = useState(false)
 
   const selectedColor = useSelector((state: RootState) => state.commonStore.sidebarColor)
+  const { loadingStatus, dataList: children } = useSelector(
+    (state: RootState) => state.workSpaceStore,
+  )
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const isExpandable = children && isOpen && children?.length > 0 && linkId === 5
+  const isDisplayFirstChar = !isOpen && !icon
+  const selected = location.pathname.split('/')[1] === item?.link.replace('/', '')
+
+  useEffect(() => {
+    const handleFetchData = async () => {
+      try {
+        dispatch(workSpaceStore.actions.setLoadingStatus('Loading'))
+        const fetchedData = await fetchWorkSpaceList()
+        dispatch(workSpaceStore.actions.setWorkSpaceList(fetchedData || []))
+      } catch (error) {
+        console.error(error)
+      } finally {
+        dispatch(workSpaceStore.actions.setLoadingStatus('Loaded'))
+      }
+    }
+    // if linkId = 5 (or workspace)
+    if (loadingStatus === 'NotLoad' && linkId === 5) {
+      handleFetchData()
+    }
+  }, [loadingStatus])
 
   const handleClickItem = () => {
     if (handleClick) {
@@ -110,8 +142,11 @@ const IconLinkList = (props: Props) => {
     setOpenHide(!openHide)
   }
 
-  const isDisplayFirstChar = !isOpen && !icon
-  const selected = location.pathname.split('/')[1] === item?.link.replace('/', '')
+  const handleNavigateChildren = (id: string) => {
+    if (linkId === 5) {
+      navigate(`/work-spaces/${id}`)
+    }
+  }
 
   return (
     <StyledLink $hideMode={!isOpen} $isSelected={selected} $sidebarColor={selectedColor}>
@@ -131,17 +166,20 @@ const IconLinkList = (props: Props) => {
             </ListItemButton>
           </Tooltip>
         </Link>
-        {children && isOpen && children?.length > 0 && (
-          <ArrowDropDownSharp className='arrow-icon' onClick={handleHide} />
-        )}
+        {isExpandable && <ArrowDropDownSharp className='arrow-icon' onClick={handleHide} />}
       </ListItem>
 
       {isOpen && openHide && (
         <Box sx={{ color: ColorUtils.getContrastingColor(selectedColor) }}>
           {children?.map((child) => (
-            <ListItem key={child.id} disablePadding>
+            <ListItem
+              key={child.id}
+              disablePadding
+              className='child-item'
+              onClick={() => handleNavigateChildren(child.id)}
+            >
               <ListItemButton style={{ paddingLeft: '50px' }}>
-                <span className='list-text'>{item.text}</span>
+                <span className='list-text'>{child.name}</span>
               </ListItemButton>
             </ListItem>
           ))}

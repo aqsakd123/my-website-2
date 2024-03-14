@@ -1,5 +1,6 @@
 import { Control, Controller } from 'react-hook-form'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { DateView } from '@mui/x-date-pickers'
 
 type InternalProps = {
   id: string
@@ -15,6 +16,7 @@ type InternalProps = {
   onChange?: (date: any) => void
   defaultValue?: Date | null
   errorMessage?: string
+  views?: DateView[]
   renderDay?: (
     day: Date | null,
     selectedDate: Date | null,
@@ -38,6 +40,7 @@ export type CalendarInputProps = {
   shouldDisableDate?: (day: Date) => boolean
   defaultValue?: Date | null
   errorMessage?: string
+  views?: DateView[]
   renderDay?: (
     day: Date | null,
     selectedDate: Date | null,
@@ -61,6 +64,7 @@ const CalendarInputInternal: React.FC<InternalProps> = (props: InternalProps) =>
     autoFocus,
     defaultValue,
     errorMessage,
+    views,
   } = props
   return (
     <DatePicker
@@ -69,6 +73,7 @@ const CalendarInputInternal: React.FC<InternalProps> = (props: InternalProps) =>
       value={valueProp}
       autoFocus={autoFocus}
       disabled={disabled}
+      views={views}
       shouldDisableDate={(value) => {
         if (shouldDisableDate) {
           return shouldDisableDate(new Date(value))
@@ -124,7 +129,7 @@ const CalendarPicker: React.FC<CalendarInputProps> = (props: CalendarInputProps)
       />
     )
   }
-  return <CalendarInputInternal {...others} />
+  return <CalendarInputInternal onChange={onChange} {...others} />
 }
 
 export default CalendarPicker

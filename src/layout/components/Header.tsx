@@ -1,7 +1,7 @@
 import './Header.scss'
 
 import { AppContext } from '@app/config/context'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import React from 'react'
 import Sidebar, { linkItems } from './Sidebar'
 import styled from '@emotion/styled'
@@ -11,7 +11,9 @@ import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
 import { loggingOut } from '@app/api/axios'
 import DialogAward from '@app/pages/AwardManagement/DialogAward'
 import { RootState } from '@app/store/store'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import awardStore from '@app/store/awardStore/AwardStore'
+import { fetchAwardList } from '@app/api/award/award-api'
 
 type HeaderProps = {
   displaySidebar: boolean
@@ -69,7 +71,7 @@ const Header = (props: HeaderProps) => {
   const { displaySidebar, handleChangeSideStatus } = props
   const { removeUser } = useContext(AppContext)
 
-  const { dataList } = useSelector((state: RootState) => state.awardStore)
+  const { dataList, loadingStatus } = useSelector((state: RootState) => state.awardStore)
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [dialogAwardOpen, setDialogAwardOpen] = React.useState<boolean>(false)
@@ -78,6 +80,26 @@ const Header = (props: HeaderProps) => {
     linkItems.filter((item) => location.pathname.split('/')[1] === item?.link.replace('/', ''))[0]
       ?.text,
   )
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const handleFetchData = async () => {
+      try {
+        dispatch(awardStore.actions.setLoadingStatus('Loading'))
+        const fetchedData = await fetchAwardList()
+        dispatch(awardStore.actions.setAwardList(fetchedData || []))
+      } catch (error) {
+        console.log(error)
+      } finally {
+        dispatch(awardStore.actions.setLoadingStatus('Loaded'))
+      }
+    }
+
+    if (loadingStatus === 'NotLoad') {
+      handleFetchData()
+    }
+  }, [loadingStatus])
+
   const currentPoint = 2500
   const awardList =
     dataList

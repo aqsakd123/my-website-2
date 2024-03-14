@@ -5,7 +5,6 @@ import MuiFormControl from '@mui/material/FormControl'
 
 const StyledMuiFormControl = styled(MuiFormControl)`
   justify-items: flex-start;
-  color: black;
   align-items: center;
 
   & .MuiFormControl-root .MuiInputBase-root {
@@ -30,7 +29,7 @@ type Props = {
 
 const InlineForm: React.FC<Props> = ({
   id,
-  label,
+  label = '',
   suffix,
   height,
   required,

@@ -1,7 +1,9 @@
 import { Specfication } from '@app/api/memo/memo-api'
 import TextInputField from '@app/components/common/TextInputField/TextInputField'
-import { Search } from '@mui/icons-material'
-import { Box } from '@mui/material'
+import CategoryDialog from '@app/pages/CategoryManagement/CategoryDialog'
+import CategoryList, { Category } from '@app/pages/CategoryManagement/CategoryList'
+import { RemoveCircle, Search } from '@mui/icons-material'
+import { Box, IconButton } from '@mui/material'
 import Button from '@mui/material/Button'
 import Popover from '@mui/material/Popover'
 import React from 'react'
@@ -22,6 +24,7 @@ const StyledProp = styled(Box)`
     border-radius: 22px;
   }
 `
+
 type FormProps = {
   specification: Specfication
   setSpecification: (value: Specfication) => void
@@ -32,6 +35,8 @@ const SearchButton: React.FC<FormProps> = (props: FormProps) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const [name, setName] = React.useState<string | undefined>(specification?.name)
+  const [openCategoryDialog, setOpenCategoryDialog] = React.useState<boolean>(false)
+  const [selectedCategory, setSelectedCategory] = React.useState<Category | undefined>(undefined)
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget)
@@ -42,7 +47,13 @@ const SearchButton: React.FC<FormProps> = (props: FormProps) => {
   }
 
   const handleSearch = () => {
-    setSpecification({ ...specification, name: name })
+    setSpecification({
+      ...specification,
+      name: name,
+      category: selectedCategory
+        ? { id: selectedCategory.id, name: selectedCategory.name }
+        : undefined,
+    })
   }
 
   const open = Boolean(anchorEl)
@@ -50,6 +61,13 @@ const SearchButton: React.FC<FormProps> = (props: FormProps) => {
 
   return (
     <StyledBox>
+      {openCategoryDialog && (
+        <CategoryDialog
+          onReturn={() => setOpenCategoryDialog(false)}
+          type='study'
+          setSelected={setSelectedCategory}
+        />
+      )}
       <Button className='search-btn' variant='contained' size='large' onClick={handleClick}>
         <Search />
       </Button>
@@ -79,6 +97,24 @@ const SearchButton: React.FC<FormProps> = (props: FormProps) => {
             value={name}
             onChange={setName}
           />
+          {selectedCategory && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <p>Selected Category: {selectedCategory?.name}</p>
+              <IconButton size='small' onClick={() => setSelectedCategory(undefined)}>
+                <RemoveCircle />
+              </IconButton>
+            </div>
+          )}
+          <Button
+            variant='contained'
+            fullWidth
+            className='search-submit'
+            style={{ marginBottom: '10px' }}
+            onClick={() => setOpenCategoryDialog(true)}
+          >
+            Open category
+          </Button>
+
           <Button
             startIcon={<Search />}
             variant='outlined'

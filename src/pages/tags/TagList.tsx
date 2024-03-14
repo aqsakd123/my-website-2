@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Button, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
+import { Box, Button, IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material'
 import ColorUtils from '@app/helpers/ColorUtils'
 import { Close, Edit } from '@mui/icons-material'
 import TagFormDialog from './Dialog/TagFormDialog'
@@ -15,6 +15,7 @@ import { Popconfirm } from 'antd'
 import TaskAltIcon from '@mui/icons-material/TaskAlt'
 import Dialog, { DialogContent } from '@app/components/common/Dialog/Dialog'
 import TextInput from '@app/components/common/TextInputField/TextInput'
+import Loading from '@app/components/common/Loading/Loading'
 
 export type Tag = {
   id: string
@@ -94,9 +95,13 @@ const TagList: React.FC<Props> = (props: Props) => {
   }
 
   const handleClickDeleteTag = async (item: Tag) => {
-    if (item.id) {
-      await deleteTag(item.id)
-      dispatch(tagStore.actions.setLoadingStatus('NotLoad'))
+    try {
+      if (item.id) {
+        await deleteTag(item.id)
+        dispatch(tagStore.actions.setLoadingStatus('NotLoad'))
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -118,6 +123,7 @@ const TagList: React.FC<Props> = (props: Props) => {
   return (
     <Dialog open onClickReturn={handleClose} title='Tag List'>
       <DialogContent>
+        {loadingStatus !== 'Loaded' && <Loading />}
         {tagFormDialogMode !== 'none' && (
           <TagFormDialog mode={tagFormDialogMode} onReturn={handleReturnFormDialog} />
         )}
@@ -133,6 +139,7 @@ const TagList: React.FC<Props> = (props: Props) => {
               fullWidth
             />
           </div>
+
           <Button variant='outlined' onClick={handleClickAddNew} sx={{ height: '40px' }}>
             Add tag
           </Button>
@@ -142,6 +149,7 @@ const TagList: React.FC<Props> = (props: Props) => {
             const bgColor = tag.color ? tag.color : darkMode ? '#ddd1d1' : '#434141'
             return (
               <Tooltip
+                key={tag.id}
                 title={
                   tag.description ? (
                     <span style={{ wordBreak: 'break-word', whiteSpace: 'pre-line' }}>
@@ -178,20 +186,25 @@ const TagList: React.FC<Props> = (props: Props) => {
                     <span style={{ fontWeight: 'bold' }}>{tag.name}</span>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       {currentTags.map((it) => it?.id).includes(tag?.id) && (
-                        <Button variant='text'>
-                          <TaskAltIcon />
-                        </Button>
+                        <IconButton>
+                          <TaskAltIcon style={{ color: ColorUtils.getContrastingColor(bgColor) }} />
+                        </IconButton>
                       )}
-                      <Edit fontSize='small' onClick={(e) => handleClickEditTag(e, tag)} />
+                      <IconButton onClick={(e) => handleClickEditTag(e, tag)}>
+                        <Edit
+                          fontSize='small'
+                          style={{ color: ColorUtils.getContrastingColor(bgColor) }}
+                        />
+                      </IconButton>
                       <Popconfirm
                         title='Are you sure you want to delete this tag?'
                         onConfirm={() => handleClickDeleteTag(tag)}
                         okText='Yes'
                         cancelText='No'
                       >
-                        <Button variant='text' onClick={(e) => e.stopPropagation()}>
-                          <Close />
-                        </Button>
+                        <IconButton onClick={(e) => e.stopPropagation()}>
+                          <Close style={{ color: ColorUtils.getContrastingColor(bgColor) }} />
+                        </IconButton>
                       </Popconfirm>
                     </div>
                   </div>

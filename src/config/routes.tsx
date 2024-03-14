@@ -8,7 +8,8 @@ import Next7Days from '@app/pages/Home/Next7Days'
 import Workspaces from '@app/pages/ToDoList/Workspaces'
 import MemoList from '@app/pages/cards/memo/MemoList'
 import StudyList from '@app/pages/cards/StudyCard/StudyList'
-import AwardList from '@app/pages/AwardManagement/AwardList'
+import FinanceList from '@app/pages/FinanceManagement/FinanceList'
+import TaskListList from '@app/pages/TaskListManagement/TaskListList'
 
 export type RouteInfo = {
   path: string
@@ -87,6 +88,10 @@ export const initRoutes = (): RouteInfo[] => {
           path: '',
           element: <Workspaces />,
         },
+        {
+          path: ':id',
+          element: <TaskListList />,
+        },
       ],
     },
     // {
@@ -107,7 +112,7 @@ export const initRoutes = (): RouteInfo[] => {
       children: [
         {
           path: '',
-          element: <AwardList />,
+          element: <FinanceList />,
         },
       ],
     },

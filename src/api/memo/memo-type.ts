@@ -1,4 +1,6 @@
-// import {  } from '@apollo/client'
+import { Category } from '@app/pages/CategoryManagement/CategoryList'
+import { Tag } from '@app/pages/Tags/TagList'
+import { QuesAndAns } from '@app/pages/cards/StudyCard/QuesAndAnsList'
 
 export type MemoInput = {
   id?: string
@@ -6,7 +8,10 @@ export type MemoInput = {
   color: string
   type: 'memo' | 'study'
   status: number
+  category?: Category
   tabCardList: TabDataInput[]
+  qaList: QuesAndAns[]
+  tags: Tag[]
 }
 
 export type TabDataInput = {
@@ -24,13 +29,24 @@ export const GET_LIST_MEMOS = `
       name
       type
       status
-      createdBy
-      createdAt
       tabCardList {
         id
         tabName
         tabContent
         position
+      }
+      tags {
+        id
+        name
+        description 
+        color 
+        type
+        icon
+      }
+      qaList {
+        id
+        question
+        answer
       }
     }
   }
@@ -48,8 +64,8 @@ export const UPDATE_MEMO = `
 `
 
 export const CHANGE_STATUS_MEMO = `
-  mutation ChangeStatus($id: ID!, $status: Int!) {
-    changeStatus(id: $id, status: $status)
+  mutation ChangeStatusMemo($id: ID!, $status: Int!) {
+    changeStatusMemo(id: $id, status: $status)
   }
 `
 

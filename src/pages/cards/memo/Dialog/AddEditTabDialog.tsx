@@ -20,16 +20,11 @@ const AddEditDialog: React.FC<Props> = (props: Props) => {
   const { handleDialogClose, handleSubmit, tabs, mode } = props
 
   const [tabName, setTabName] = useState('')
-  const [tabContent, setTabContent] = useState('')
 
   const snackbar = useSnackbar()
 
   const handleTabNameChange = (value: string) => {
     setTabName(value)
-  }
-
-  const handleTabContentChange = (value: string) => {
-    setTabContent(value)
   }
 
   const onSubmit = () => {
@@ -42,7 +37,6 @@ const AddEditDialog: React.FC<Props> = (props: Props) => {
       const newTab: TabData = {
         prefixId: mode === 'tab' ? Date.now().toString() : undefined,
         tabName,
-        tabContent,
       }
       handleSubmit(newTab)
     }
@@ -62,7 +56,7 @@ const AddEditDialog: React.FC<Props> = (props: Props) => {
           }}
         >
           <TextInput
-            label={mode === 'tab' ? 'Tab Name' : 'Card Name'}
+            label={mode === 'tab' ? 'Tab Name' : 'New Note Name'}
             variant='filled'
             fullWidth
             value={tabName}
@@ -72,18 +66,6 @@ const AddEditDialog: React.FC<Props> = (props: Props) => {
             maxLength={25}
             required
           />
-          {mode === 'tab' && (
-            <TextInput
-              type='textarea'
-              variant='filled'
-              rowsMin={4}
-              label='Tab Content'
-              value={tabContent}
-              onChange={handleTabContentChange}
-              id='tabContent'
-              name='tabContent'
-            />
-          )}
         </form>
       </DialogContent>
       <DialogActions>

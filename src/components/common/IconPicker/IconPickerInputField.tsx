@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import InlineForm from '../Form/InlineForm'
-import IconPickerInner, { ReactIconPickerProps } from './IconPickerInner'
+import IconPicker, { IconPickerProps } from './IconPicker'
 
 type Props = {
   id: string
@@ -8,13 +8,27 @@ type Props = {
   required?: boolean
   label?: ReactNode
   labelWidth?: number
-  errorMessage?: ReactNode
+  error?: boolean
+  errorMessage?: string
   tooltip?: string
   height?: string
-} & ReactIconPickerProps
+} & IconPickerProps
 
 const IconPickerInputField: React.FC<Props> = (props: Props) => {
-  const { id, required, label = '', labelWidth, tooltip, height, value, onChange } = props
+  const {
+    id,
+    required,
+    label = '',
+    labelWidth,
+    name,
+    tooltip,
+    height,
+    value,
+    error,
+    errorMessage,
+    onChange,
+    ...rest
+  } = props
 
   return (
     <InlineForm
@@ -24,8 +38,10 @@ const IconPickerInputField: React.FC<Props> = (props: Props) => {
       required={required}
       tooltip={tooltip}
       height={height}
+      error={error}
+      errorMessage={errorMessage}
     >
-      <IconPickerInner value={value} onChange={onChange} />
+      <IconPicker id={id} name={name} value={value} onChange={onChange} {...rest} />
     </InlineForm>
   )
 }
