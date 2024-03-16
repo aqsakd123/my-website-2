@@ -195,6 +195,8 @@ const InnerTextInput: React.FC<InnerProps> = (props: InnerProps) => {
         style={{ width: '100%', ...style }}
         inputProps={{
           maxLength,
+          scale: 1,
+          displayedThousandsSeparator: true,
           style: { imeMode },
           'data-testid': id,
         }}
@@ -208,7 +210,6 @@ const InnerTextInput: React.FC<InnerProps> = (props: InnerProps) => {
           startAdornment: prefix ? <div style={{ marginRight: '10px' }}>{prefix}</div> : undefined,
           endAdornment: suffix ? <div style={{ marginLeft: '10px' }}>{suffix}</div> : undefined,
         }}
-        // disableUnderline
         fullWidth={fullWidth}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}

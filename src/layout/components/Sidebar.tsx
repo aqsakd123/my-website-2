@@ -19,6 +19,7 @@ import { LuBookMarked } from 'react-icons/lu'
 import { AnimationType } from '../common/AnimatedIcon'
 import { tokens } from '@app/config/ThemeProvider'
 import { useFontAwesomeIconPack } from '@app/components/common/IconPicker/hooks/useCollectIconPack'
+import HourglassBottomIcon from '@mui/icons-material/HourglassBottom'
 
 export const drawerWidth = 240
 type SidebarProps = {
@@ -98,8 +99,8 @@ export const linkItems: LinkItemsType[] = [
   },
   {
     id: 4,
-    text: 'Next 7 days',
-    link: '/next-7-days',
+    text: 'Calendar',
+    link: '/calendars',
     separator: true,
     icon: <CalendarMonthSharp />,
   },
@@ -116,6 +117,13 @@ export const linkItems: LinkItemsType[] = [
     text: 'Workspaces',
     link: '/work-spaces',
     icon: <RocketLaunchOutlined />,
+  },
+  {
+    id: 5.1,
+    text: 'Countdown Management',
+    link: '/countdown',
+    icon: <HourglassBottomIcon style={{ height: '20px', width: '20px' }} />,
+    animation: 'flip',
   },
   {
     id: 6,

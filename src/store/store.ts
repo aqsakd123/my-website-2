@@ -19,6 +19,7 @@ import categoryStore from './categoryStore/CategoryStore'
 import taskListStore from './taskListStore/TaskListStore'
 import subTaskStore from './subTaskStore/SubTaskStore'
 import workSpaceStore from './workSpaceStore/WorkSpaceStore'
+import countdownStore from './countdownStore/CountdownStore'
 
 const rootPersistConfig = {
   key: 'root',
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   tasklistStore: taskListStore.reducer,
   subTaskStore: subTaskStore.reducer,
   workSpaceStore: workSpaceStore.reducer,
+  countdownStore: countdownStore.reducer,
 })
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer)

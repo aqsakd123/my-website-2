@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react'
 import styled from 'styled-components'
 
 import { Close } from '@mui/icons-material'
-import { DialogTitle, Typography, IconButton, Dialog as MuiDialog } from '@mui/material'
+import { DialogTitle, Typography, IconButton, Dialog as MuiDialog, Slide } from '@mui/material'
 import { TransitionProps } from '@mui/material/transitions'
 
 import MuiDialogContent, {
@@ -106,7 +106,6 @@ type Props = {
 }
 
 const EditDialogTransition = React.forwardRef<unknown, TransitionProps>((props, ref) => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return <Slide direction='up' ref={ref} {...props} />
 })

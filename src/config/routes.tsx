@@ -10,6 +10,7 @@ import MemoList from '@app/pages/cards/memo/MemoList'
 import StudyList from '@app/pages/cards/StudyCard/StudyList'
 import FinanceList from '@app/pages/FinanceManagement/FinanceList'
 import TaskListList from '@app/pages/TaskListManagement/TaskListList'
+import CountdownList from '@app/pages/CountdownManagement/CountdownList'
 
 export type RouteInfo = {
   path: string
@@ -64,12 +65,12 @@ export const initRoutes = (): RouteInfo[] => {
       children: [
         {
           path: '',
-          element: <Target />,
+          element: <TaskListList />,
         },
       ],
     },
     {
-      path: '/next-7-days',
+      path: '/calendars',
       layout: <Default />,
       roles: ['any'],
       children: [
@@ -94,17 +95,17 @@ export const initRoutes = (): RouteInfo[] => {
         },
       ],
     },
-    // {
-    //   path: '/award',
-    //   layout: <Default />,
-    //   roles: ['any'],
-    //   children: [
-    //     {
-    //       path: '',
-    //       element: <AwardList />,
-    //     },
-    //   ],
-    // },
+    {
+      path: '/countdown',
+      layout: <Default />,
+      roles: ['any'],
+      children: [
+        {
+          path: '',
+          element: <CountdownList />,
+        },
+      ],
+    },
     {
       path: '/finance',
       layout: <Default />,

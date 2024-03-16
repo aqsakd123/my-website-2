@@ -101,6 +101,7 @@ const Header = (props: HeaderProps) => {
   }, [loadingStatus])
 
   const currentPoint = 2500
+
   const awardList =
     dataList
       .filter((it) => it.awardPoint > currentPoint)

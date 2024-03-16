@@ -12,22 +12,40 @@ const FormToggleButtonGroup = styled(ToggleButtonGroup)`
   width: 100%;
 ` as typeof ToggleButtonGroup
 
+const StyledToggle = styled.div`
+  width: 100%;
+  .toggle-button {
+    border-radius: 25px;
+    font-size: 16px;
+  }
+
+  .btn-toggle: first-of-type {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 25px;
+  }
+
+  .btn-toggle: last-of-type {
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+  }
+`
 const FormToggleButton = styled(ToggleButton)<{ $disabledWithColor?: boolean }>`
   height: 32px;
   width: 100%;
   padding: 7px;
-  fontsize: ${({ theme }) => theme.typography.pxToRem(13)};
   line-height: 0.7;
-  border-radius: 1.5em;
+  border-radius: 25px;
   flex: 1;
   border: 0;
   background-color: #ebe7e5;
   &.Mui-selected {
-    color: #ffffff;
-    background-color: #273d6a;
-    color: yellow;
+    color: #ffffff !important;
+    background-color: #1b4fbb !important;
     &:hover {
-      color: #ffffff;
       background-color: #1118278c;
     }
   }
@@ -97,29 +115,33 @@ const OptionButtonInternal: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <FormToggleButtonGroup
-      id={id}
-      size={size}
-      value={value}
-      onChange={handleChange}
-      exclusive
-      defaultValue={defaultValue}
-      data-testid={id}
-    >
-      {options.map((option) => (
-        <FormToggleButton
-          name={name}
-          size={size}
-          key={option.value}
-          value={option.value}
-          disabled={disabled}
-          data-testid={`${id}-${option.value}`}
-          $disabledWithColor={disabledWithColor}
-        >
-          {option.label}
-        </FormToggleButton>
-      ))}
-    </FormToggleButtonGroup>
+    <StyledToggle>
+      <FormToggleButtonGroup
+        id={id}
+        size={size}
+        value={value}
+        onChange={handleChange}
+        exclusive
+        defaultValue={defaultValue}
+        data-testid={id}
+        className='toggle-button'
+      >
+        {options.map((option) => (
+          <FormToggleButton
+            name={name}
+            size={size}
+            key={option.value}
+            value={option.value}
+            className='btn-toggle'
+            disabled={disabled}
+            data-testid={`${id}-${option.value}`}
+            $disabledWithColor={disabledWithColor}
+          >
+            {option.label}
+          </FormToggleButton>
+        ))}
+      </FormToggleButtonGroup>
+    </StyledToggle>
   )
 }
 
@@ -132,6 +154,7 @@ const OptionButton: React.FC<Props> = (props: Props) => {
       <Controller
         render={({ field: { onChange: handleChange } }) => (
           <OptionButtonInternal
+            {...props}
             onChange={(newChecked) => {
               handleChange(newChecked)
               if (onChange) {
@@ -139,7 +162,6 @@ const OptionButton: React.FC<Props> = (props: Props) => {
               }
               return newChecked
             }}
-            {...props}
           />
         )}
         control={control}

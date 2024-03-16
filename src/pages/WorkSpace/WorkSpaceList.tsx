@@ -117,7 +117,12 @@ const WorkSpaceList: React.FC = () => {
                 <span>Description: {workSpace.description}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Button onClick={() => handleClickEditWorkSpace(workSpace)}>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleClickEditWorkSpace(workSpace)
+                  }}
+                >
                   <Edit fontSize='small' />
                 </Button>
                 <Popconfirm

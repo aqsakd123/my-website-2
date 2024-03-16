@@ -20,7 +20,7 @@ export type SelectProps = {
   style?: object
   placeholder?: string
   defaultValue?: string
-  value?: string
+  value?: string | string[]
   onChange?: (event: any) => void
   error?: boolean
   label?: string
@@ -150,8 +150,7 @@ const SelectComponent = (props: SelectProps) => {
           onChange={(newValue) => {
             handleChange(newValue.target.value)
             if (onChange) {
-              //@ts-ignore
-              onChange(newValue)
+              onChange(newValue.target.value)
             }
             return newValue
           }}

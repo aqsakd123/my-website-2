@@ -77,6 +77,8 @@ type SubTaskBase = {
 
 export type SubTaskSpecification = {
   parentTaskListId?: string
+  startDate?: Date
+  endDate?: Date
 }
 type Props = {
   taskList: TaskList

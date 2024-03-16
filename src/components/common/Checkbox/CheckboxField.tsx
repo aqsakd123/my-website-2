@@ -4,7 +4,7 @@ import InlineForm from '../Form/InlineForm'
 import FormGroup from '@mui/material/FormGroup/FormGroup'
 import Checkbox from './Checkbox'
 
-type Props = {
+export type Props = {
   id: string
   required?: boolean
   error?: boolean
@@ -68,7 +68,7 @@ const InternalCheckboxField: React.FC<Props> = (props: Props) => {
       error={error}
       errorMessage={errorMessage}
       disabled={disabled}
-      labelWidth={labelWidth}
+      labelWidth={labelWidth || 0}
       tooltip={tooltip}
     >
       <FormGroup row={orientation === 'horizontal'} id={id} data-testid={id}>

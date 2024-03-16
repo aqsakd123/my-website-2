@@ -2,50 +2,45 @@ import React from 'react'
 import Dialog from '@app/components/common/Dialog/Dialog'
 import { useDispatch, useSelector } from 'react-redux'
 import useConfirm from '@app/components/common/ConfirmDialog/useConfirm'
-import CategoryFormInput from './CategoryFormInput'
-import { CategoryInput } from '../CategoryList'
+import CountdownFormInput from './CountdownFormInput'
+import { CountdownInput, Countdown } from '../CountdownList'
 import { RootState } from '@app/store/store'
 import { DialogState } from '@app/store/commonStore/CommonStore'
-import { insertCategory, updateCategory } from '@app/api/category/category-api'
+import { insertCountdown, updateCountdown } from '@app/api/countdown/countdown-api'
 
-import categoryStore from '@app/store/categoryStore/CategoryStore'
+import countdownStore from '@app/store/countdownStore/CountdownStore'
+import dayjs from 'dayjs'
 
 type FormProps = {
-  type: string
   mode: DialogState
   onReturn: () => void
-  parentId?: string
 }
 
-const CategoryFormDialog: React.FC<FormProps> = (props: FormProps) => {
-  const { onReturn, mode, type, parentId } = props
+const CountdownFormDialog: React.FC<FormProps> = (props: FormProps) => {
+  const { onReturn, mode } = props
 
-  const { editItem, dirty: isDirty } = useSelector((state: RootState) => state.categoryStore)
+  const { editItem, dirty: isDirty } = useSelector((state: RootState) => state.countdownStore)
 
   const confirm = useConfirm()
   const dispatch = useDispatch()
 
-  const handleSubmit = async (data: CategoryInput) => {
+  const handleSubmit = async (data: Countdown) => {
     try {
       if (mode === 'add') {
-        await insertCategory({
+        await insertCountdown({
           ...data,
-          type,
-          parentCategoryId: parentId,
         })
       } else if (mode === 'edit' && editItem?.id) {
-        const newData: CategoryInput = {
-          name: data.name,
-          description: data.description,
-          type: editItem.type,
+        const newData: Countdown = {
+          ...editItem,
+          ...data,
         }
-        await updateCategory(editItem?.id, newData)
+        await updateCountdown(editItem?.id, newData)
       }
-      dispatch(categoryStore.actions.setLoadingStatus('NotLoad'))
+      dispatch(countdownStore.actions.setLoadingStatus('NotLoad'))
       onReturn()
     } catch (error) {
       console.error(error)
-      dispatch(categoryStore.actions.setLoadingStatus('Loaded'))
     }
   }
 
@@ -62,9 +57,9 @@ const CategoryFormDialog: React.FC<FormProps> = (props: FormProps) => {
     onReturn()
   }
 
-  let defaultValue: CategoryInput | undefined = undefined
+  let defaultValue: CountdownInput | undefined = undefined
   if (mode === 'edit' && editItem) {
-    defaultValue = { ...editItem }
+    defaultValue = { ...editItem, endDate: dayjs(editItem?.endDate) }
   }
 
   return (
@@ -75,8 +70,8 @@ const CategoryFormDialog: React.FC<FormProps> = (props: FormProps) => {
       fullWidth
       selfContentAndActions
     >
-      <CategoryFormInput
-        id={mode === 'add' ? 'add-category' : 'edit-category'}
+      <CountdownFormInput
+        id={mode === 'add' ? 'add-countdown' : 'edit-countdown'}
         defaultValues={defaultValue}
         onSubmit={handleSubmit}
       />
@@ -84,4 +79,4 @@ const CategoryFormDialog: React.FC<FormProps> = (props: FormProps) => {
   )
 }
 
-export default CategoryFormDialog
+export default CountdownFormDialog

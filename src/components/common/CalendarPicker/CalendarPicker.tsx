@@ -1,5 +1,5 @@
 import { Control, Controller } from 'react-hook-form'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
+import { DatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker'
 import { DateView } from '@mui/x-date-pickers'
 
 type InternalProps = {
@@ -47,7 +47,7 @@ export type CalendarInputProps = {
     dayInCurrentMonth: boolean,
     dayComponent: JSX.Element,
   ) => JSX.Element
-}
+} & DatePickerProps<Date>
 
 const CalendarInputInternal: React.FC<InternalProps> = (props: InternalProps) => {
   const {
@@ -65,9 +65,11 @@ const CalendarInputInternal: React.FC<InternalProps> = (props: InternalProps) =>
     defaultValue,
     errorMessage,
     views,
+    ...others
   } = props
   return (
     <DatePicker
+      {...others}
       label={label}
       defaultValue={defaultValue}
       value={valueProp}

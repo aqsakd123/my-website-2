@@ -34,7 +34,6 @@ const OptionButtonField: React.FC<Props> = (props: Props) => {
     value,
     control,
     onChange,
-    defaultValue,
     tooltip,
   } = props
 
@@ -57,7 +56,6 @@ const OptionButtonField: React.FC<Props> = (props: Props) => {
         disabled={disabled}
         control={control}
         onChange={onChange}
-        defaultValue={defaultValue}
       />
     </InlineForm>
   )

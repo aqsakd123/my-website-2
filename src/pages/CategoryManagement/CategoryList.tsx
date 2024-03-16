@@ -44,6 +44,7 @@ type CategoryBase = {
   type?: string
   tag?: Tag[]
   subCategories?: Category[]
+  parentCategoryId?: string
 }
 
 type Props = {
